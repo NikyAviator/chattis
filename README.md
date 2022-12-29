@@ -1,7 +1,3 @@
-# chattis
-
-Chat app!
-
 # Betygsgrundande inlämningsuppgift: En chatapplikation med inloggning och adminfunktioner
 
 Skapa en chatapplikation med inloggning och administrationsfunktioner.
@@ -16,6 +12,7 @@ Lösenord ska vara minst 8 tecken långa och innehålla minst en stor bokstav, s
 Detta ska kontrolleras både på frontend och på backend. (Notera även: Vid registrering ska användare ange lösenord 2 gånger och dessa ska matcha innan man får registrera sig.)
 
 En inloggad användare ska kunna:
+
 Se andra användare sorterade i namnordning och söka/filtrera bland dessa.
 
 Skapa/påbörja en ny chat (med ämnesrubrik) och bjuda in andra användare till den.
@@ -30,7 +27,8 @@ Se om en administratör har stängt av dig från en chatt.
 
 “Blocka”/ta bort användare från en chat hen skapat/påbörjat.
 
-En administratör ska kunna:
+# En administratör ska kunna:
+
 Se alla chattar och deras innehåll.
 
 Ta bort enskilda chat-meddelande i valfri chat.
@@ -38,8 +36,8 @@ Ta bort enskilda chat-meddelande i valfri chat.
 Skriva meddelanden/kommentarer i valfri chat och då ska de tydligt synas att dessa kommer från en admin.
 
 Blocka/stänga av valfri användare i valfri chat.
-
-Chattars ämnesrubrik och chatmeddelanden ska sparas i en databas. När man går med i en chat ska man kunna se chathistoriken.
+Chattars ämnesrubrik och chatmeddelanden ska sparas i en databas.
+När man går med i en chat ska man kunna se chathistoriken.
 
 Användargränssnittet ska vara lättförståeligt och responsivt. (Bygg det gärna “mobile first” om du inte skulle hinna med anpassning till större skärmar. Det ska fungera på mobil!)
 
@@ -48,7 +46,6 @@ Användargränssnittet ska vara lättförståeligt och responsivt. (Bygg det gä
 Efter mer än 3 inloggningsförsök med felaktigt lösenord ska en användare inte kunna pröva att logga in igen förrän efter en minut. (Genomför denna begränsning även på backend, inte bara i frontend.)
 
 Filtrera i backend bort otrevliga ord från chattmeddelanden (skapa en lista som lagras antingen i databasen eller i en JSON-fil, med minst 25 ord eller fraser som automatiskt filteras bort - t.ex. rasistiska ord, diskriminerande ord, kvinnofientliga ord etc.)
-
 Användargränssnittet ska vara lättförståeligt och responsivt. Det ska vara väl anpassat till alla skärmstorlekar.
 
 # Tekniska krav
@@ -68,6 +65,7 @@ Skapa ett eget registrerings- och inlogningssystem. Cookies kopplade till sessio
 Implementera antingen SSE eller websockets för att kunna “pusha” meddelanden från servern till klienten så att de syns direkt. (SSE rekommenderas i första hand då detta är enklare, energisnålare samt mer snarlikt REST, men du väljer). Vi kommer att gå igenom/ha en föreläsning om hur SSE fungerar.
 
 Skapa ett GitHub-repository för din kod. Gör frekventa commits med bra rubriker/beskrivningar till ditt GitRepository.
+
 Använd inte CORS för att kunna köra utvecklingsserver och backend med REST-api parallelt. Använd ditt utvecklings/bygg-verktygs möjlighet att proxy:a trafiken vidare till din backend.
 
 Användargränssnittet ska vara skapat med med hjälp av ett CSS-bibliotek (t.ex. Bootstrap, Materialize eller TailWind).
@@ -77,6 +75,7 @@ Användargränssnittet ska vara skapat med med hjälp av ett CSS-bibliotek (t.ex
 Dessa krav ska följas oavsett om du strävar efter G eller VG. (Siktar du på VG bör det inte finnas några allvarliga brister din implementation av något av det som nämns nedan.)
 
 Det ska INTE gå att hacka sajten med hjälp av:
+
 XSS-attacker
 
 Brister i ACL/användarbehörighets-konfiguration.
@@ -86,6 +85,7 @@ Injections till databasen.
 Det ska INTE gå att krascha sajten genom olika typer av oväntad inmatning, varken i frontendgränssnittet eller via REST (t.ex. ogiltig JSON, stora datamängder etc).
 
 Om man får tag i databasen och källkoden från git ska det ändå inte gå att ta reda på användares lösenord ens om de är så pass enkla som “Blomman1” (dvs. kan sättas samman från en ordbok).
+
 I praktiken: Du ska envägskryptera lösenord med en säker algoritm och ett salt som inte finns lagrat i själva kodbasen.
 
 Det ska inte gå att “tjuvlyssna” på chattar man inte själv är med i!
