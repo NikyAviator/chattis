@@ -1,9 +1,11 @@
 // Create an express instance that connects to our db!
 require('dotenv').config({ path: `${process.cwd()}/../../.env` });
 const express = require('express');
-const router = require('./api/routes');
+const router = require('./api/routes.cjs');
+const session = require('express-session');
+const { default: pool } = require('./db.cjs');
 
-const port = process.env.HTTP_PORT;
+const port = process.env.BACKEND_HTTP_PORT;
 const api_url = process.env.API_URL;
 
 const server = express();
@@ -30,12 +32,17 @@ if (process.env.PRODUCTION) {
   }
 }
 
+const store = new (require('connect-pg-simple')(session))({
+  conObject: pool,
+  conString: process.env.CON_STRING,
+});
+
 server.use(
   session({
     secret: salt,
     resave: false,
     saveUninitialized: true,
     cookie: { secure: 'auto' },
-    // store: store({ dbPath: '' }), !TODO
+    store: store,
   })
 );
