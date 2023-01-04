@@ -10,10 +10,6 @@ const api_url = process.env.API_URL;
 
 const server = express();
 
-server.use(api_url, router);
-server.use(express.json({ limit: '100mb' }));
-server.listen(port, () => console.log(`Server live at ${port}`));
-
 // salt for cookie hash generation
 let salt = 'someUnusualStringThatIsUniqueForThisProject';
 
@@ -46,3 +42,6 @@ server.use(
     store: store,
   })
 );
+server.use(express.json({ limit: '100mb' }));
+server.use(api_url, router);
+server.listen(port, () => console.log(`Server live at ${port}`));

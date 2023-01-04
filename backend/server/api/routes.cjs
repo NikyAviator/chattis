@@ -4,8 +4,10 @@ const controller = require('./controllers.cjs');
 
 router.get('/sse', controller.sse);
 
-router.post('/user/create-user', controller.createUser);
+router.post('/user/register', controller.createUser);
 router.post('/user/login', controller.loginUser);
+router.delete('/user/logout', controller.logoutUser);
+router.get('/fetch-user', controller.fetchUser);
 router.post('/user/block/:id', controller.blockUser);
 
 router.get('/chats/:id', controller.getChats);

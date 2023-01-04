@@ -1,4 +1,6 @@
-require('../db.cjs');
+const passwordEncryptor = require('../../security/passwordEncryptor.cjs');
+
+const db = require('../db.cjs');
 
 let connections = [];
 
@@ -43,17 +45,17 @@ function broadcast(event, data) {
 }
 
 const createUser = async (req, res) => {
-  const { user_name, password, user_role } = req.body;
+  const { username, password, user_role } = req.body;
 
-  if (user_name == null || password == null || user_role == null) {
+  if (username == null || password == null || user_role == null) {
     return res.sendStatus(403);
   }
 
   try {
-    const hashedPassword = bcrypt.hashSync(req.body.password, 10);
-    const data = await client.query(
-      'INSERT INTO users (firstname, surname, email, password) VALUES ($1, $2, $3, $4) RETURNING *',
-      [firstname, surname, email, hashedPassword]
+    const hashedPassword = passwordEncryptor(password);
+    const data = await db.query(
+      'INSERT INTO users (user_name, password, user_role) VALUES ($1, $2, $3) RETURNING *',
+      [username, hashedPassword, user_role]
     );
 
     if (data.rows.length === 0) {
@@ -63,9 +65,8 @@ const createUser = async (req, res) => {
 
     req.session.user = {
       id: user.id,
-      firstname: user.firstname,
-      surname: user.surname,
-      email: user.email,
+      user_name: user.user_name,
+      user_role: user.user_role,
     };
 
     res.status(200);
@@ -77,14 +78,56 @@ const createUser = async (req, res) => {
 };
 
 const loginUser = async (req, res) => {
-  if (!req) {
-    res.status(500).json({ success: false, error: 'Incorrect parameters' });
+  const { username, password } = req.body;
+
+  if (username == null || password == null) {
+    return res.sendStatus(403);
   }
 
   try {
-  } catch (err) {
-    res.status(500).json({ success: false, error: err.message });
+    const data = await db.query(
+      'SELECT id, user_name, password, user_role FROM users WHERE user_name = $1',
+      [username]
+    );
+
+    if (data.rows.length === 0) {
+      return res.sendStatus(403);
+    }
+    const user = data.rows[0];
+
+    const matches = passwordEncryptor(password) === user.password;
+    if (!matches) {
+      return res.sendStatus(403);
+    }
+
+    req.session.user = {
+      id: user.id,
+      username: user.user_name,
+      user_role: user.user_role,
+    };
+
+    res.status(200);
+    return res.json({ user: req.session.user });
+  } catch (e) {
+    console.error(e);
+    return res.sendStatus(403);
   }
+};
+const logoutUser = async (req, res) => {
+  try {
+    await req.session.destroy();
+    return res.sendStatus(200);
+  } catch (e) {
+    console.error(e);
+    return res.sendStatus(500);
+  }
+};
+const fetchUser = async (req, res) => {
+  if (req.sessionID && req.session.user) {
+    res.status(200);
+    return res.json({ user: req.session.user });
+  }
+  return res.sendStatus(403);
 };
 
 const blockUser = async (req, res) => {
@@ -186,24 +229,12 @@ const deleteMessage = async (req, res) => {
   }
 };
 
-/* const x = async (req, res) => {
-    if (!req) {
-        res.status(500).json({ success: false, error: 'Incorrect parameters' });
-    }
-
-    try {
-
-    }
-    catch (err) {
-        res.status(500).json({ success: false, error: err.message });
-    }
-} */
-
 module.exports = {
   sse,
-  storeSession,
   createUser,
   loginUser,
+  logoutUser,
+  fetchUser,
   blockUser,
   getChats,
   createChat,
