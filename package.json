@@ -9,7 +9,6 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "bcrypt": "^5.1.0",
     "bootstrap": "^5.2.3",
     "concurrently": "^7.6.0",
     "connect-pg-simple": "^8.0.0",
