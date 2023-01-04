@@ -42,54 +42,37 @@ function broadcast(event, data) {
   }
 }
 
-/* app.post('/login', (req, res) => {
-    if (!acl('login', req)) {
-        res.status(405);
-        res.json({ _error: 'Not allowed' });
-    }
-    req.body[passwordField] =
-        passwordEncryptor(req.body[passwordField]);
-    let stmt = db.prepare(`
-      SELECT * FROM customers
-      WHERE email = :email AND password = :password
-    `);
-    let result = stmt.all(req.body)[0] || { _error: 'No such user.' };
-    delete result.password;
-    if (!result._error) {
-        req.session.user = result;
-    }
-    res.json(result);
-});
-
-app.get('/login', (req, res) => {
-    if (!acl('login', req)) {
-        res.status(405);
-        res.json({ _error: 'Not allowed' });
-    }
-    res.json(req.session.user || { _error: 'Not logged in' });
-});
-
-app.delete('/login', (req, res) => {
-    if (!acl('login', req)) {
-        res.status(405);
-        res.json({ _error: 'Not allowed' });
-    }
-    delete req.session.user;
-    res.json({ success: 'logged out' });
-}); */
-
-const storeSession = async (req, res) => {
-  console.log('STORE SESSION');
-};
-
 const createUser = async (req, res) => {
-  if (!req) {
-    res.status(500).json({ success: false, error: 'Incorrect parameters' });
+  const { user_name, password, user_role } = req.body;
+
+  if (user_name == null || password == null || user_role == null) {
+    return res.sendStatus(403);
   }
 
   try {
-  } catch (err) {
-    res.status(500).json({ success: false, error: err.message });
+    const hashedPassword = bcrypt.hashSync(req.body.password, 10);
+    const data = await client.query(
+      'INSERT INTO users (firstname, surname, email, password) VALUES ($1, $2, $3, $4) RETURNING *',
+      [firstname, surname, email, hashedPassword]
+    );
+
+    if (data.rows.length === 0) {
+      res.sendStatus(403);
+    }
+    const user = data.rows[0];
+
+    req.session.user = {
+      id: user.id,
+      firstname: user.firstname,
+      surname: user.surname,
+      email: user.email,
+    };
+
+    res.status(200);
+    return res.json({ user: req.session.user });
+  } catch (e) {
+    console.error(e);
+    return res.sendStatus(403);
   }
 };
 
