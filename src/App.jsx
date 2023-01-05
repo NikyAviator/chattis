@@ -6,8 +6,8 @@ import '../scss/main.scss';
 function App() {
   return (
     <>
-      <Header />
       <BrowserRouter>
+        <Header />
         <Routes>
           <Route path='/' element={<HomePage />} />
         </Routes>
