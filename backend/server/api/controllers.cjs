@@ -1,5 +1,5 @@
+const acl = require('../../security/acl.cjs');
 const passwordEncryptor = require('../../security/passwordEncryptor.cjs');
-
 const db = require('../db.cjs');
 
 let connections = [];
@@ -45,17 +45,20 @@ function broadcast(event, data) {
 }
 
 const createUser = async (req, res) => {
-  const { username, password, user_role } = req.body;
+  const { username, password } = req.body;
 
-  if (username == null || password == null || user_role == null) {
+  if (username == null || password == null) {
     return res.sendStatus(403);
   }
-
+  if (!acl(req.route.path, req)) {
+    res.status(405).json({ error: 'Not allowed' });
+    return;
+  }
   try {
     const hashedPassword = passwordEncryptor(password);
     const data = await db.query(
       'INSERT INTO users (user_name, password, user_role) VALUES ($1, $2, $3) RETURNING *',
-      [username, hashedPassword, user_role]
+      [username, hashedPassword, 'user']
     );
 
     if (data.rows.length === 0) {
@@ -63,11 +66,11 @@ const createUser = async (req, res) => {
     }
     const user = data.rows[0];
 
-    req.session.user = {
-      id: user.id,
-      user_name: user.user_name,
-      user_role: user.user_role,
-    };
+    // req.session.user = {
+    //   id: user.id,
+    //   user_name: user.user_name,
+    //   user_role: user.user_role,
+    // };
 
     res.status(200);
     return res.json({ user: req.session.user });
@@ -83,7 +86,10 @@ const loginUser = async (req, res) => {
   if (username == null || password == null) {
     return res.sendStatus(403);
   }
-
+  if (!acl(req.route.path, req)) {
+    res.status(405).json({ error: 'Not allowed' });
+    return;
+  }
   try {
     const data = await db.query(
       'SELECT id, user_name, password, user_role FROM users WHERE user_name = $1',
@@ -114,6 +120,16 @@ const loginUser = async (req, res) => {
   }
 };
 const logoutUser = async (req, res) => {
+  // Bugg vid logout
+  console.log(req.route, req.session.user);
+  console.log(!acl(req.route.path, req));
+
+  // Problem with ACL rule
+  // if (!acl(req.route.path, req)) {
+  //   res.status(405).json({ error: 'Not allowed' });
+  //   return;
+  // }
+
   try {
     await req.session.destroy();
     return res.sendStatus(200);
@@ -123,6 +139,11 @@ const logoutUser = async (req, res) => {
   }
 };
 const fetchUser = async (req, res) => {
+  if (!acl(req.route.path, req)) {
+    res.status(405).json({ error: 'Not allowed' });
+    return;
+  }
+
   if (req.sessionID && req.session.user) {
     res.status(200);
     return res.json({ user: req.session.user });
@@ -197,11 +218,19 @@ const banFromChat = async (req, res) => {
 };
 
 const sendMessage = async (req, res) => {
-  if (!req) {
-    res.status(500).json({ success: false, error: 'Incorrect parameters' });
+  if (!req.body) {
+    res.status(500).json({ success: false, error: 'Something went wrong :(' });
   }
-
+  if (!acl(req.route.path, req)) {
+    res.status(405).json({ error: 'Not allowed' });
+    return;
+  }
   try {
+    let message = req.body;
+    message.timestamp = Date.now();
+    broadcast('new-message', message);
+    res.send('ok');
+    // just nu sparas meddelande i broadcast.
   } catch (err) {
     res.status(500).json({ success: false, error: err.message });
   }
