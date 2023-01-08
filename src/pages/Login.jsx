@@ -3,7 +3,7 @@ import Form from 'react-bootstrap/Form';
 import { Container, Row, Col, Card } from 'react-bootstrap';
 import axios from 'axios';
 import { useState } from 'react';
-
+import { LinkContainer } from 'react-router-bootstrap';
 function Login() {
   const [username, setUserName] = useState('');
   const [password, setPassword] = useState('');
@@ -54,6 +54,11 @@ function Login() {
                 <Button variant='primary' type='submit'>
                   Login
                 </Button>
+                <LinkContainer to='/signup'>
+                  <Button variant='primary' className='mx-5'>
+                    No account? Sign up here!
+                  </Button>
+                </LinkContainer>
               </Form>
             </Col>
           </Row>

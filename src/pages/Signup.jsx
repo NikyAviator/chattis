@@ -3,6 +3,7 @@ import Form from 'react-bootstrap/Form';
 import axios from 'axios';
 import { useState } from 'react';
 import { Container, Row, Col, Card } from 'react-bootstrap';
+import { LinkContainer } from 'react-router-bootstrap';
 import CheckPasswordLength from '../components/CheckPasswordLength';
 function Signup() {
   const [username, setUserName] = useState('');
@@ -49,9 +50,14 @@ function Signup() {
                   <Form.Label>Password:</Form.Label>
                   <Form.Control type='password' placeholder='Password' />
                 </Form.Group>
-                <Button variant='primary' type='submit'>
+                <Button variant='primary' type='submit' className='mx-auto'>
                   Register
                 </Button>
+                <LinkContainer to='/login'>
+                  <Button variant='primary' className='mx-auto'>
+                    Have an account? Log in here!
+                  </Button>
+                </LinkContainer>
               </Form>
             </Col>
           </Row>
