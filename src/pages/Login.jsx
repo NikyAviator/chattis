@@ -57,7 +57,7 @@ function Login() {
                 </Button>
                 <div className='py-4'>
                   <p>
-                    Don't have an account?<Link to='/signup'> Sign up</Link>
+                    Don't have an account? <Link to='/signup'>Sign up</Link>
                   </p>
                 </div>
               </Form>

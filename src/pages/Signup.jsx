@@ -55,7 +55,7 @@ function Signup() {
                 </Button>
                 <div className='py-4'>
                   <p>
-                    Already have an account?
+                    Already have an account?{' '}
                     <Link to='/login'> Log in here</Link>
                   </p>
                 </div>
