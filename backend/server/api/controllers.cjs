@@ -109,7 +109,7 @@ const loginUser = async (req, res) => {
     req.session.user = {
       id: user.id,
       username: user.user_name,
-      user_role: user.user_role,
+      userRole: user.user_role,
     };
 
     res.status(200);
@@ -174,6 +174,9 @@ const getChats = async (req, res) => {
 };
 // CREATE CHAT
 const createChat = async (req, res) => {
+  console.log(req.route.path);
+  console.log(req.session.user);
+
   if (!req.body.subject) {
     res.status(500).json({ success: false, error: 'Incorrect parameters' });
   }
@@ -182,12 +185,18 @@ const createChat = async (req, res) => {
     return;
   }
   try {
-    const data = await db.query('INSERT INTO chats ()', [username]);
+    const data = await db.query(
+      'INSERT INTO chats (createdby, subject) VALUES($1, $2) RETURNING * ',
+      [req.session.user.id, req.body.subject]
+    );
+    res
+      .status(200)
+      .json({ success: true, result: 'Chat created', chat: data.rows[0] });
   } catch (err) {
     res.status(500).json({ success: false, error: err.message });
   }
 };
-
+// INVITE TO CHAT
 const inviteToChat = async (req, res) => {
   if (!req) {
     res.status(500).json({ success: false, error: 'Incorrect parameters' });

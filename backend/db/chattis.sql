@@ -3,6 +3,10 @@ CREATE DATABASE "chattis"
     OWNER = postgres
     ENCODING = 'UTF-8'
     CONNECTION LIMIT = -1;
+-- by default this is to create the table in the CLI
+-- \i in CLI makes u run a file (for CREATE DB)
+-- remove \c chattis and run the rest in a gui!
+\c chattis
 
 CREATE TABLE "users"(
     "id" uuid DEFAULT gen_random_uuid() PRIMARY KEY ,
@@ -15,7 +19,7 @@ CREATE TABLE "chats"(
     "id" uuid DEFAULT gen_random_uuid() PRIMARY KEY,
     "subject" VARCHAR(255) NOT NULL,
     "createdby" uuid NOT NULL,
-    CONSTRAINT "chat_createdby_foreign" FOREIGN KEY("createdby") REFERENCES "user_id"
+    CONSTRAINT "chat_createdby_foreign" FOREIGN KEY("createdby") REFERENCES "users"("id")
 );
 
 CREATE TABLE "chat_users"(
