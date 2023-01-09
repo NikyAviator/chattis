@@ -172,13 +172,17 @@ const getChats = async (req, res) => {
     res.status(500).json({ success: false, error: err.message });
   }
 };
-
+// CREATE CHAT
 const createChat = async (req, res) => {
-  if (!req) {
+  if (!req.body.subject) {
     res.status(500).json({ success: false, error: 'Incorrect parameters' });
   }
-
+  if (!acl(req.route.path, req)) {
+    res.status(405).json({ error: 'Not allowed' });
+    return;
+  }
   try {
+    const data = await db.query('INSERT INTO chats ()', [username]);
   } catch (err) {
     res.status(500).json({ success: false, error: err.message });
   }

@@ -13,7 +13,9 @@ CREATE TABLE "users"(
 
 CREATE TABLE "chats"(
     "id" uuid DEFAULT gen_random_uuid() PRIMARY KEY,
-    "subject" VARCHAR(255) NOT NULL
+    "subject" VARCHAR(255) NOT NULL,
+    "createdby" uuid NOT NULL,
+    CONSTRAINT "chat_createdby_foreign" FOREIGN KEY("createdby") REFERENCES "user_id"
 );
 
 CREATE TABLE "chat_users"(
