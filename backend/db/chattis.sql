@@ -46,9 +46,6 @@ CREATE TABLE "user_blockings"(
 );
 
 
-
-
-
 CREATE TABLE "session" (
   "sid" varchar NOT NULL COLLATE "default",
   "sess" json NOT NULL,
