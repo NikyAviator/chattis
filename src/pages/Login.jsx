@@ -3,11 +3,11 @@ import Form from 'react-bootstrap/Form';
 import { Container, Row, Col, Card } from 'react-bootstrap';
 import axios from 'axios';
 import { useState } from 'react';
-import { LinkContainer } from 'react-router-bootstrap';
-import { Link } from 'react-router-dom';
-function Login() {
+import { Link, useNavigate } from 'react-router-dom';
+function Login({ setUserCallback }) {
   const [username, setUserName] = useState('');
   const [password, setPassword] = useState('');
+  const navigate = useNavigate();
 
   function onSubmitLoginForm(event) {
     event.preventDefault();
@@ -18,9 +18,16 @@ function Login() {
       })
       .then((response) => {
         console.log(response);
+        setUserCallback(response.data.user);
+      })
+      .catch((error) => {
+        console.log(error);
+        return;
       });
     setUserName('');
     setPassword('');
+
+    navigate('/chat');
   }
 
   return (

@@ -17,6 +17,9 @@
     "/user/block/:id": {
       "post": true
     },
+    "/fetch-user": {
+      "get": true
+    },
     "/chats": {
       "get": true
     },
