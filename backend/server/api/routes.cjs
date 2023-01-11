@@ -15,6 +15,7 @@ router.get('/fetch-user', controller.fetchUser);
 router.post('/user/block/:id', controller.blockUser);
 // GET A WHOLE GROUP CHAT
 router.get('/chats/:id', controller.getChats);
+// GET CHAT USERS THAT
 // CREATE A CHAT
 router.post('/chat/create', controller.createChat);
 // INVITE TO CHAT
