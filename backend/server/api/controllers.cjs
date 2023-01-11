@@ -43,7 +43,7 @@ function broadcast(event, data) {
     res.write('event:' + event + '\ndata:' + JSON.stringify(data) + '\n\n');
   }
 }
-
+// CREATE USER
 const createUser = async (req, res) => {
   const { username, password } = req.body;
 
@@ -65,6 +65,8 @@ const createUser = async (req, res) => {
       res.sendStatus(403);
     }
     const user = data.rows[0];
+    // OM man vill ha skapat en session med login info direkt
+    // efter skapandet av usern
 
     // req.session.user = {
     //   id: user.id,
@@ -73,13 +75,14 @@ const createUser = async (req, res) => {
     // };
 
     res.status(200);
+    // JSON borde returnera tomt eftersom vi inte skapar session (när den är utkommenterad)
     return res.json({ user: req.session.user });
   } catch (e) {
     console.error(e);
     return res.sendStatus(403);
   }
 };
-
+// LOG IN USER
 const loginUser = async (req, res) => {
   const { username, password } = req.body;
 
@@ -120,15 +123,15 @@ const loginUser = async (req, res) => {
   }
 };
 const logoutUser = async (req, res) => {
-  // Bugg vid logout
   console.log(req.route, req.session.user);
   console.log(!acl(req.route.path, req));
 
-  // Problem with ACL rule
-  // if (!acl(req.route.path, req)) {
-  //   res.status(405).json({ error: 'Not allowed' });
-  //   return;
-  // }
+  // Problem with ACL rule, might be resolved?
+  // Session now gone with logout!
+  if (!acl(req.route.path, req)) {
+    res.status(405).json({ error: 'Not allowed' });
+    return;
+  }
 
   try {
     await req.session.destroy();
@@ -138,6 +141,8 @@ const logoutUser = async (req, res) => {
     return res.sendStatus(500);
   }
 };
+
+// FETCH USER
 const fetchUser = async (req, res) => {
   if (!acl(req.route.path, req)) {
     res.status(405).json({ error: 'Not allowed' });
@@ -150,13 +155,28 @@ const fetchUser = async (req, res) => {
   }
   return res.sendStatus(403);
 };
-
+// BLOCK USER
 const blockUser = async (req, res) => {
-  if (!req) {
+  if (!req.params.id) {
     res.status(500).json({ success: false, error: 'Incorrect parameters' });
+  }
+  if (!acl(req.route.path, req)) {
+    res.status(405).json({ error: 'Not allowed' });
+    return;
   }
 
   try {
+    await db.query(
+      `
+        INSERT INTO user_blockings (user_id, blocked_user_id)
+        VALUES ($1, $2)
+      `[
+        // These are the values that are set in $1, $2
+        (req.session.user.id, req.params.id)
+      ]
+    );
+
+    res.status(200).json({ success: true, result: 'User blocked' });
   } catch (err) {
     res.status(500).json({ success: false, error: err.message });
   }
