@@ -122,6 +122,7 @@ const loginUser = async (req, res) => {
     return res.sendStatus(403);
   }
 };
+// LOG OUT USER
 const logoutUser = async (req, res) => {
   console.log(req.route, req.session.user);
   console.log(!acl(req.route.path, req));
@@ -181,17 +182,59 @@ const blockUser = async (req, res) => {
     res.status(500).json({ success: false, error: err.message });
   }
 };
-
+// GET CHATS-TITLE AND ID FROM EACH CREATED GROUP
 const getChats = async (req, res) => {
-  if (!req) {
-    res.status(500).json({ success: false, error: 'Incorrect parameters' });
+  if (!acl(req.route.path, req)) {
+    res.status(405).json({ error: 'Not allowed' });
+    return;
   }
 
   try {
+    const query = await db.query(
+      `
+                SELECT *
+                FROM chats, chat_users
+                WHERE chats.id = chat_users.chat_id
+                AND chat_users.user_id = $1
+                AND chat_users.invitation_accepted = true
+            `,
+      [req.session.user.id]
+    );
+
+    res.status(200).json({ success: true, result: query.rows });
   } catch (err) {
     res.status(500).json({ success: false, error: err.message });
   }
 };
+// GET CHAT USERS THAT ARE USING A CHAT (group in a chat)
+const getChatUsers = async (req, res) => {
+  if (!acl(req.route.path, req)) {
+    res.status(405).json({ error: 'Not allowed' });
+    return;
+  }
+  if (!req.query.chatId) {
+    res.status(500).json({ success: false, error: 'Incorrect parameters' });
+  }
+
+  try {
+    const query = await db.query(
+      `
+      SELECT users.id, users.user_name, chat_users.blocked
+      FROM users, chats, chat_users
+      WHERE users.id = chat_users.user_id
+      AND chats.id = chat_users.chat_id
+      AND chats.id = $1
+      AND users.id != $2
+      
+      `,
+      [req.query.chatId, req.session.user.id]
+    );
+    res.status(200).json({ success: true, result: query.rows });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+};
+
 // CREATE CHAT
 const createChat = async (req, res) => {
   console.log(req.route.path);
@@ -218,11 +261,34 @@ const createChat = async (req, res) => {
 };
 // INVITE TO CHAT
 const inviteToChat = async (req, res) => {
-  if (!req) {
+  // If u haven't added these parameters in the query, it is not allowed!
+  if (!req.query.chatId || !req.query.userId) {
     res.status(500).json({ success: false, error: 'Incorrect parameters' });
+    return;
   }
-
+  if (!acl(req.route.path, req)) {
+    res.status(405).json({ error: 'Not allowed' });
+    return;
+  }
   try {
+    // WHERE NOT EXIST: means that we cannot invite a person twice
+    await db.query(
+      `
+      INSERT INTO chat_users (chat_id, user_id)
+      SELECT $1, $2
+      WHERE NOT EXISTS(
+        SELECT *
+        FROM chat_users
+        WHERE chat_id = $1
+        AND user_id = $2
+
+      )
+      `,
+      [req.query.chatId, req.query.userId]
+    );
+    res
+      .status(200)
+      .json({ success: true, result: 'Invitation to chat has been sent!' });
   } catch (err) {
     res.status(500).json({ success: false, error: err.message });
   }
@@ -299,6 +365,7 @@ module.exports = {
   fetchUser,
   blockUser,
   getChats,
+  getChatUsers,
   createChat,
   inviteToChat,
   acceptChatInvite,
