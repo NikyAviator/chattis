@@ -206,6 +206,7 @@ const getChats = async (req, res) => {
     res.status(500).json({ success: false, error: err.message });
   }
 };
+
 // GET CHAT USERS THAT ARE USING A CHAT (group in a chat)
 const getChatUsers = async (req, res) => {
   if (!acl(req.route.path, req)) {
@@ -225,7 +226,6 @@ const getChatUsers = async (req, res) => {
       AND chats.id = chat_users.chat_id
       AND chats.id = $1
       AND users.id != $2
-      
       `,
       [req.query.chatId, req.session.user.id]
     );
@@ -249,7 +249,7 @@ const createChat = async (req, res) => {
   }
   try {
     const data = await db.query(
-      'INSERT INTO chats (createdby, subject) VALUES($1, $2) RETURNING * ',
+      'INSERT INTO chats (created_by, subject) VALUES($1, $2) RETURNING * ',
       [req.session.user.id, req.body.subject]
     );
     res
@@ -259,6 +259,7 @@ const createChat = async (req, res) => {
     res.status(500).json({ success: false, error: err.message });
   }
 };
+
 // INVITE TO CHAT
 const inviteToChat = async (req, res) => {
   // If u haven't added these parameters in the query, it is not allowed!

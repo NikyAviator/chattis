@@ -22,7 +22,7 @@ const Sidebar = () => {
       <ListGroup>
         {rooms.map((room, index) => (
           <ListGroup.Item action variant='light' key={index}>
-            {room}
+            {room.subject}
           </ListGroup.Item>
         ))}
       </ListGroup>
@@ -30,7 +30,7 @@ const Sidebar = () => {
       <ListGroup>
         {membersList.map((members, index) => (
           <ListGroup.Item action variant='light' key={index}>
-            {members}
+            {members.user_name}
           </ListGroup.Item>
         ))}
       </ListGroup>
