@@ -293,32 +293,61 @@ const inviteToChat = async (req, res) => {
     res.status(500).json({ success: false, error: err.message });
   }
 };
-
+// ACCPET CHAT INVITE
 const acceptChatInvite = async (req, res) => {
-  if (!req) {
-    res.status(500).json({ success: false, error: 'Incorrect parameters' });
+  if (!req.params.id) {
+    res.status(400).json({ success: false, error: 'Incorrect parameters' });
   }
-
+  if (!acl(req.route.path, req)) {
+    res.status(405).json({ error: 'Not allowed' });
+    return;
+  }
   try {
+    await db.query(
+      `
+                UPDATE chat_users
+                SET invitation_accepted = true
+                WHERE chat_id = $1
+                AND user_id = $2
+            `,
+      [req.params.id, req.session.user.id]
+    );
+    res.status(200).json({ success: true, result: 'Chat invite accepted' });
   } catch (err) {
     res.status(500).json({ success: false, error: err.message });
   }
 };
-
+// BAN FROM CHAT
 const banFromChat = async (req, res) => {
-  if (!req) {
-    res.status(500).json({ success: false, error: 'Incorrect parameters' });
+  if (!req.query.chatId || !req.query.userId) {
+    res.status(400).json({ success: false, error: 'Incorrect parameters' });
+    return;
   }
-
+  if (!acl(req.route.path, req)) {
+    res.status(405).json({ error: 'Not allowed' });
+    return;
+  }
   try {
+    await db.query(
+      `
+       UPDATE chat_users
+       SET blocked = NOT blocked
+       WHERE chat_id = $1
+       AND user_id = $2 
+      `[(req.query.chatId, req.query.userId)]
+    );
+    res.status(200).json({
+      success: true,
+      result: 'User banned/unbanned (toggle) from chat',
+    });
   } catch (err) {
     res.status(500).json({ success: false, error: err.message });
   }
 };
-
+// SEND A MESSAGE
 const sendMessage = async (req, res) => {
   if (!req.body) {
-    res.status(500).json({ success: false, error: 'Something went wrong :(' });
+    res.status(400).json({ success: false, error: 'Something went wrong :(' });
   }
   if (!acl(req.route.path, req)) {
     res.status(405).json({ error: 'Not allowed' });
@@ -334,7 +363,7 @@ const sendMessage = async (req, res) => {
     res.status(500).json({ success: false, error: err.message });
   }
 };
-
+// GET CHAT MESSAGES
 const getChatMessages = async (req, res) => {
   if (!req) {
     res.status(500).json({ success: false, error: 'Incorrect parameters' });
