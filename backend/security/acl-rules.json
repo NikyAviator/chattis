@@ -20,7 +20,7 @@
     "/fetch-user": {
       "get": true
     },
-    "/chats": {
+    "/chat": {
       "get": true
     },
     "/chat/create": {

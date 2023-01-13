@@ -145,10 +145,11 @@ const logoutUser = async (req, res) => {
 
 // FETCH USER
 const fetchUser = async (req, res) => {
-  if (!acl(req.route.path, req)) {
-    res.status(405).json({ error: 'Not allowed' });
-    return;
-  }
+  // TODO PROBLEM
+  // if (!acl(req.route.path, req)) {
+  //   res.status(405).json({ error: 'Not allowed' });
+  //   return;
+  // }
 
   if (req.sessionID && req.session.user) {
     res.status(200);
@@ -182,12 +183,13 @@ const blockUser = async (req, res) => {
     res.status(500).json({ success: false, error: err.message });
   }
 };
-// GET CHATS-TITLE AND ID FROM EACH CREATED GROUP
+// GET CHATS-CREATED GROUP
 const getChats = async (req, res) => {
-  if (!acl(req.route.path, req)) {
-    res.status(405).json({ error: 'Not allowed' });
-    return;
-  }
+  // TODO PROBLEM
+  // if (!acl(req.route.path, req)) {
+  //   res.status(405).json({ error: 'Not allowed' });
+  //   return;
+  // }
 
   try {
     const query = await db.query(
