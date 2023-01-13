@@ -374,7 +374,7 @@ const getChatMessages = async (req, res) => {
     res.status(500).json({ success: false, error: err.message });
   }
 };
-
+// DELETE MESSAGE
 const deleteMessage = async (req, res) => {
   if (!req) {
     res.status(500).json({ success: false, error: 'Incorrect parameters' });

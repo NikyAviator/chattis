@@ -7,7 +7,6 @@ import Navbar from 'react-bootstrap/Navbar';
 import { LinkContainer } from 'react-router-bootstrap';
 import logo from '../../assets/chat-logo.jpg';
 import { useNavigate } from 'react-router-dom';
-import { useEffect } from 'react';
 function Navigation({ userData, setUserCallback }) {
   const navigate = useNavigate();
 
