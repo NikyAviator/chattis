@@ -2,7 +2,7 @@ import axios from 'axios';
 import React, { useState, useEffect } from 'react';
 import { ListGroup } from 'react-bootstrap';
 
-const Sidebar = () => {
+const Sidebar = ({ setUserCallback }) => {
   const [rooms, setRooms] = useState([]);
   const [membersList, setMembersList] = useState([]);
 

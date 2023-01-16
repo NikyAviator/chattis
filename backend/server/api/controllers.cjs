@@ -194,12 +194,12 @@ const getChats = async (req, res) => {
   try {
     const query = await db.query(
       `
-                SELECT *
-                FROM chats, chat_users
-                WHERE chats.id = chat_users.chat_id
-                AND chat_users.user_id = $1
-                AND chat_users.invitation_accepted = true
-            `,
+      SELECT *
+      FROM chats, chat_users
+      WHERE chats.id = chat_users.chat_id
+      AND chat_users.user_id = $1
+      AND chat_users.invitation_accepted = true
+      `,
       [req.session.user.id]
     );
 
@@ -284,7 +284,6 @@ const inviteToChat = async (req, res) => {
         FROM chat_users
         WHERE chat_id = $1
         AND user_id = $2
-
       )
       `,
       [req.query.chatId, req.query.userId]
