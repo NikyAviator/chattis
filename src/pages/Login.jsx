@@ -9,9 +9,9 @@ function Login({ setUserCallback }) {
   const [password, setPassword] = useState('');
   const navigate = useNavigate();
 
-  function onSubmitLoginForm(event) {
+  async function onSubmitLoginForm(event) {
     event.preventDefault();
-    axios
+    await axios
       .post('/api/user/login', {
         username: username,
         password: password,

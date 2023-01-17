@@ -48,7 +48,7 @@ const createUser = async (req, res) => {
   const { username, password } = req.body;
 
   if (username == null || password == null) {
-    return res.sendStatus(403);
+    return res.status(403);
   }
   if (!acl(req.route.path, req)) {
     res.status(405).json({ error: 'Not allowed' });
@@ -62,7 +62,7 @@ const createUser = async (req, res) => {
     );
 
     if (data.rows.length === 0) {
-      res.sendStatus(403);
+      res.status(403);
     }
     const user = data.rows[0];
     // OM man vill ha skapat en session med login info direkt
@@ -79,7 +79,7 @@ const createUser = async (req, res) => {
     return res.json({ user: req.session.user });
   } catch (e) {
     console.error(e);
-    return res.sendStatus(403);
+    return res.status(403);
   }
 };
 // LOG IN USER
@@ -87,7 +87,7 @@ const loginUser = async (req, res) => {
   const { username, password } = req.body;
 
   if (username == null || password == null) {
-    return res.sendStatus(403);
+    return res.status(403);
   }
   if (!acl(req.route.path, req)) {
     res.status(405).json({ error: 'Not allowed' });
@@ -100,13 +100,13 @@ const loginUser = async (req, res) => {
     );
 
     if (data.rows.length === 0) {
-      return res.sendStatus(403);
+      return res.status(403);
     }
     const user = data.rows[0];
 
     const matches = passwordEncryptor(password) === user.password;
     if (!matches) {
-      return res.sendStatus(403);
+      return res.status(403);
     }
 
     req.session.user = {
@@ -119,7 +119,7 @@ const loginUser = async (req, res) => {
     return res.json({ user: req.session.user });
   } catch (e) {
     console.error(e);
-    return res.sendStatus(403);
+    return res.status(403);
   }
 };
 // LOG OUT USER
@@ -133,10 +133,11 @@ const logoutUser = async (req, res) => {
 
   try {
     await req.session.destroy();
-    return res.sendStatus(200);
+    res.status(200).json({ success: true, result: 'Logged out' });
+    return;
   } catch (e) {
     console.error(e);
-    return res.sendStatus(500);
+    return res.status(500);
   }
 };
 
