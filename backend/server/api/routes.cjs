@@ -16,6 +16,9 @@ router.delete('/user/logout', controller.logoutUser);
 // FETCH ONE USER - DONE - Y (getLoggedInUser)
 router.get('/fetch-user', controller.fetchUser);
 
+// FETCH ALL OUR USERS
+router.get('/get-all-users', controller.getAllUsers);
+
 // BLOCK A USER - DONE - Y (men minus :id)
 router.post('/user/block/:id', controller.blockUser);
 

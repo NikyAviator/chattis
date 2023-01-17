@@ -124,9 +124,6 @@ const loginUser = async (req, res) => {
 };
 // LOG OUT USER
 const logoutUser = async (req, res) => {
-  console.log(req.route, req.session.user);
-  console.log(!acl(req.route.path, req));
-
   // Problem with ACL rule, might be resolved?
   // Session now gone with logout!
   if (!acl(req.route.path, req)) {
@@ -157,6 +154,28 @@ const fetchUser = async (req, res) => {
     res.status(403).json({ success: false });
   }
 };
+// GET ALL USERS
+const getAllUsers = async (req, res) => {
+  if (!acl(req.route.path, req)) {
+    res.status(405).json({ error: 'Not allowed' });
+    return;
+  }
+
+  try {
+    let query = await db.query(
+      `
+      SELECT id, user_name
+       FROM users
+       WHERE id != $1
+      `,
+      [req.session.user.id]
+    );
+    res.status(200).json({ success: true, result: query.rows });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+};
+
 // BLOCK USER
 const blockUser = async (req, res) => {
   if (!req.params.id) {
@@ -394,6 +413,7 @@ module.exports = {
   loginUser,
   logoutUser,
   fetchUser,
+  getAllUsers,
   blockUser,
   getChats,
   getChatUsers,

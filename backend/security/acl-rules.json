@@ -20,6 +20,9 @@
     "/fetch-user": {
       "get": true
     },
+    "/get-all-users": {
+      "get": true
+    },
     "/chat": {
       "get": true
     },
