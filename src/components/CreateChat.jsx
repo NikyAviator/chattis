@@ -8,7 +8,7 @@ import Container from 'react-bootstrap/Container';
 import axios from 'axios';
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-const CreateChat = ({ setUserCallback }) => {
+const CreateChat = ({ setUserCallback, setChatCallback }) => {
   const [subject, setSubject] = useState('');
   const navigate = useNavigate();
 
@@ -23,7 +23,12 @@ const CreateChat = ({ setUserCallback }) => {
         console.log(error);
         return;
       });
+    await axios.get('/api/chats').then((res) => {
+      console.log(res.data.result);
+      setChatCallback(res.data.result);
+    });
     setSubject('');
+
     navigate('/chat');
   }
   return (
@@ -36,6 +41,7 @@ const CreateChat = ({ setUserCallback }) => {
               <Form>
                 <Form.Group className='mb-3' controlId='formBasicEmail'>
                   <Form.Control
+                    value={subject}
                     onChange={(event) => {
                       setSubject(event.target.value);
                     }}
