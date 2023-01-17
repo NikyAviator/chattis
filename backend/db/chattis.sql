@@ -27,7 +27,7 @@ CREATE TABLE "chat_users"(
     "chat_id" uuid NOT NULL,
     "user_id" uuid NOT NULL,
     "blocked" BOOLEAN NOT NULL DEFAULT FALSE,
-    "invitation_accepted" BOOLEAN NOT NULL,
+    "invitation_accepted" BOOLEAN NOT NULL DEFAULT FALSE,
     CONSTRAINT "chat_users_chat_id_foreign" FOREIGN KEY("chat_id") REFERENCES "chats"("id"),
     CONSTRAINT "chat_users_user_id_foreign" FOREIGN KEY("user_id") REFERENCES "users"("id")
 );
