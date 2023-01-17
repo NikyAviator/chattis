@@ -145,17 +145,17 @@ const logoutUser = async (req, res) => {
 
 // FETCH USER
 const fetchUser = async (req, res) => {
-  // TODO PROBLEM
-  // if (!acl(req.route.path, req)) {
-  //   res.status(405).json({ error: 'Not allowed' });
-  //   return;
-  // }
+  // TODO PROBLEM - SEEMS to be working now
+  if (!acl(req.route.path, req)) {
+    res.status(405).json({ error: 'Not allowed' });
+    return;
+  }
 
   if (req.sessionID && req.session.user) {
-    res.status(200);
-    return res.json({ user: req.session.user });
+    res.status(200).json({ user: req.session.user });
+  } else {
+    res.status(403).json({ success: false });
   }
-  return res.sendStatus(403);
 };
 // BLOCK USER
 const blockUser = async (req, res) => {

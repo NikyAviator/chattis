@@ -3,6 +3,7 @@ import { Container, Row, Col } from 'react-bootstrap';
 import Sidebar from '../components/Sidebar';
 import MessageForm from '../components/MessageForm';
 const Chat = ({ setUserCallback }) => {
+  console.log(setUserCallback);
   return (
     <Container>
       <Row>
