@@ -2,17 +2,24 @@ const acl = require('../../security/acl.cjs');
 const passwordEncryptor = require('../../security/passwordEncryptor.cjs');
 const db = require('../db.cjs');
 
-let connections = [];
-
+let connections = {};
 const sse = async (req, res) => {
   // Add the response to open connections
-  connections.push(res);
+  //connections.push(res);
+  if (!connections[req.query.chatId]) {
+    connections[req.query.chatId] = [res];
+  } else {
+    connections[req.query.chatId].push(res);
+  }
 
   // listen for client disconnection
   // and remove the client's response
   // from the open connections list
   req.on('close', () => {
-    connections = connections.filter((openRes) => openRes != res);
+    //connections = connections.filter(openRes => openRes != res)
+    connections[req.query.chatId] = connections[req.query.chatId].filter(
+      (openRes) => openRes != res
+    );
 
     // message all open connections that a client disconnected
     broadcast('disconnect', {
@@ -30,19 +37,23 @@ const sse = async (req, res) => {
   // message all connected clients that this
   // client connected
   broadcast('connect', {
-    message: 'clients connected: ' + connections.length,
+    //message: 'clients connected: ' + connections.length
+    message: 'clients connected: ' + connections[req.query.chatId].length,
+    chatId: req.query.chatId,
   });
 };
 
-// function to send message to all connected clients
 function broadcast(event, data) {
+  console.log('broadcast event,', data);
   // loop through all open connections and send
   // some data without closing the connection (res.write)
-  for (let res of connections) {
+  //for (let res of connections) {
+  for (let res of connections[data.chatId]) {
     // syntax for a SSE message: 'event: message \ndata: "the-message" \n\n'
     res.write('event:' + event + '\ndata:' + JSON.stringify(data) + '\n\n');
   }
 }
+
 // CREATE USER
 const createUser = async (req, res) => {
   const { username, password } = req.body;

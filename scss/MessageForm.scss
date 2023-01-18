@@ -51,3 +51,21 @@
   text-align: center;
   height: 100px;
 }
+
+.messageOther {
+  display: block;
+  margin-right: auto;
+  background: rgb(179, 179, 179) !important;
+  padding: 15px;
+  border-radius: 15px;
+  max-width: fit-content;
+}
+
+.messageMine {
+  display: block;
+  margin-left: auto;
+  background: rgb(184, 124, 253) !important;
+  padding: 15px;
+  border-radius: 15px;
+  max-width: fit-content;
+}

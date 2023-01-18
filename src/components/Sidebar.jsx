@@ -26,14 +26,14 @@ const Sidebar = ({ setUserCallback, setSelectedChatCallback }) => {
     getChatInvitations();
   }, []);
 
+  const getChats = async () => {
+    await axios.get('/api/chats').then((res) => {
+      console.log(res.data.result);
+      setRooms(res.data.result);
+    });
+  };
   // Get all the available rooms and users
   useEffect(() => {
-    const getChats = async () => {
-      await axios.get('/api/chats').then((res) => {
-        console.log(res.data.result);
-        setRooms(res.data.result);
-      });
-    };
     const getAllUsers = async () => {
       await axios.get('/api/get-all-users').then((res) => {
         console.log(res.data.result);
@@ -100,6 +100,7 @@ const Sidebar = ({ setUserCallback, setSelectedChatCallback }) => {
               onClick={() => {
                 getChatInvitations();
                 setShowChatInvitations(false);
+                getChats();
               }}
             >
               🚫 Close

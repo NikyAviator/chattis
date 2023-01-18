@@ -54,9 +54,7 @@ router.get('/chat/messages/:id', controller.getChatMessages);
 
 // DELETE A MESSAGE - TODO - Y
 router.delete('/chat/delete-message/:id', controller.deleteMessage);
-// Vilka jag inte har:
-// router.post('/chat/disconnect', controller.disconnectFromChat);
-// router.get('/chat/invite', controller.getInvitationEligbleUsers);
+
 router.store = () => {
   router.post('/store-session', controller.storeSession);
 };

@@ -1,14 +1,65 @@
 import React, { useState, useEffect } from 'react';
-import { Button, Form, Row, Col, Modal } from 'react-bootstrap';
+import { Button, Form, Row, Col, Modal, Card } from 'react-bootstrap';
 import '../../scss/main.scss';
 import axios from 'axios';
-const MessageForm = ({ selectedChat, setSelectedChatCallback }) => {
+let sse;
+const MessageForm = ({ selectedChat, setSelectedChatCallback, userData }) => {
   const [showInvitePeople, setShowInvitePeople] = useState(false);
   const [userList, setUserList] = useState([]);
   const [searchedUsername, setSearchedUsername] = useState('');
+  const [message, setMessage] = useState('');
+  const [messages, setMessages] = useState([]);
+  const startSSE = () => {
+    // workaround for being called twice in React.StrictMode
+    // close the old sse connection if it exists...
+    sse && sse.close();
 
-  function handleSubmit(event) {
+    sse = new EventSource(`/api/sse?chatId=${selectedChat.chat_id}`, {
+      withCredentials: true,
+    });
+
+    sse.addEventListener('connect', (message) => {
+      let data = JSON.parse(message.data);
+      data.chatData = selectedChat;
+      console.log('[connect]', data);
+    });
+
+    sse.addEventListener('disconnect', (message) => {
+      let data = JSON.parse(message.data);
+      console.log('[disconnect]', data);
+      sse.close();
+    });
+
+    sse.addEventListener('new-message', (message) => {
+      let data = JSON.parse(message.data);
+      data.chatData = selectedChat;
+      setMessages((messages) => [...messages, data]);
+      console.log(messages);
+      setMessage('');
+    });
+  };
+
+  useEffect(() => {
+    startSSE();
+    //}, [messages]);
+  }, []);
+
+  // handles the send message
+  async function handleSubmit(event) {
     event.preventDefault();
+    await axios
+      .post('/api/chat/message', {
+        chatId: selectedChat.chat_id,
+        content: message,
+        from: userData.username,
+        fromId: userData.id,
+      })
+      .then((res) => {
+        console.log(res.data);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
   }
   console.log(selectedChat);
 
@@ -25,6 +76,11 @@ const MessageForm = ({ selectedChat, setSelectedChatCallback }) => {
     };
     getUsers();
   }, [searchedUsername]);
+
+  useEffect(() => {
+    let scroll_to_bottom = document.querySelector('.messages-output');
+    scroll_to_bottom.scrollTop = scroll_to_bottom.scrollHeight;
+  }, [messages]);
 
   return (
     <>
@@ -103,7 +159,31 @@ const MessageForm = ({ selectedChat, setSelectedChatCallback }) => {
         </Modal.Footer>
       </Modal>
 
-      <div className='messages-output'></div>
+      <div className='messages-output'>
+        {messages.length > 0 &&
+          messages.map((message, id) => (
+            <Col key={id}>
+              <Card
+                className={
+                  message.fromId === userData.id
+                    ? 'messageMine my-1 px-1'
+                    : 'messageOther my-1 px-1'
+                }
+              >
+                <Col>{message.from}</Col>
+                <Col>
+                  @ ⏲{' '}
+                  {new Date(message.timestamp)
+                    .toISOString()
+                    .slice(0, 16)
+                    .split('T')
+                    .join(' ')}
+                </Col>
+                <Col>{message.content}</Col>
+              </Card>
+            </Col>
+          ))}
+      </div>
       <Form onSubmit={handleSubmit}>
         <Row>
           <Col md={11}>
@@ -111,6 +191,10 @@ const MessageForm = ({ selectedChat, setSelectedChatCallback }) => {
               <Form.Control
                 type='text'
                 placeholder='Your message'
+                onChange={(e) => {
+                  setMessage(e.target.value);
+                }}
+                value={message}
               ></Form.Control>
             </Form.Group>
           </Col>
