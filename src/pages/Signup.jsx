@@ -4,10 +4,23 @@ import axios from 'axios';
 import { useState } from 'react';
 import { Container, Row, Col, Card } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
-import CheckPasswordLength from '../components/CheckPasswordLength';
+
 function Signup() {
   const [username, setUserName] = useState('');
   const [password, setPassword] = useState('');
+  const [validPassword, setValidPassword] = useState(false);
+
+  const validatePassword = (e) => {
+    const regex = /^(?=.*[\d!#$%&? "])(?=.*[A-Z])[a-zA-Z0-9!#$%&?]{8,}/;
+    console.log(e.target.value);
+    if (e.target?.value && e.target.value.match(regex)) {
+      setValidPassword(true);
+      setPassword(e.target.value);
+    } else {
+      setValidPassword(false);
+      setPassword(e.target.value);
+    }
+  };
 
   function onSubmitRegister(event) {
     event.preventDefault();
@@ -19,6 +32,7 @@ function Signup() {
       .then((response) => {
         console.log(response);
       });
+    alert('Account registered!');
     setUserName('');
     setPassword('');
   }
@@ -48,9 +62,22 @@ function Signup() {
                   className='mb-3'
                 >
                   <Form.Label>Password:</Form.Label>
-                  <Form.Control type='password' placeholder='Password' />
+                  <Form.Label>
+                    ( Min 8 chars, Capitalize one letter and min one
+                    number/special char)
+                  </Form.Label>
+                  <Form.Control type='text' placeholder='Password' />
                 </Form.Group>
-                <Button variant='primary' type='submit' className='mx-auto'>
+                <Form.Group onChange={validatePassword} className='mb-3'>
+                  <Form.Label>Retype your password:</Form.Label>
+                  <Form.Control type='text' placeholder='Password' />
+                </Form.Group>
+                <Button
+                  variant='primary'
+                  type='submit'
+                  className='mx-auto'
+                  disabled={validPassword ? false : true}
+                >
                   Register
                 </Button>
                 <div className='py-4'>
