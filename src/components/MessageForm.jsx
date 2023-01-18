@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button, Form, Row, Col, Modal } from 'react-bootstrap';
 import '../../scss/main.scss';
 import axios from 'axios';
@@ -6,10 +6,25 @@ const MessageForm = ({ selectedChat, setSelectedChatCallback }) => {
   const [showInvitePeople, setShowInvitePeople] = useState(false);
   const [userList, setUserList] = useState([]);
   const [searchedUsername, setSearchedUsername] = useState('');
+
   function handleSubmit(event) {
     event.preventDefault();
   }
   console.log(selectedChat);
+
+  useEffect(() => {
+    const getUsers = () => {
+      axios
+        .get(
+          `/api/user/search?username=${searchedUsername}&chatId=${selectedChat.chat_id}`
+        )
+        .then((res) => {
+          setUserList(res.data.result);
+        })
+        .catch((err) => console.log(err));
+    };
+    getUsers();
+  }, [searchedUsername]);
 
   return (
     <>
@@ -47,8 +62,9 @@ const MessageForm = ({ selectedChat, setSelectedChatCallback }) => {
               <Form.Control
                 className='m-2'
                 type='text'
-                onChange={(e) => setUsername(e.target.value)}
                 placeholder={'Find user...'}
+                value={searchedUsername}
+                onChange={(event) => setSearchedUsername(event.target.value)}
               />
             </Form.Group>
           </Form>

@@ -177,6 +177,38 @@ const getAllUsers = async (req, res) => {
   }
 };
 
+// SEARCH FOR USERS
+const searchUsers = async (req, res) => {
+  if (!acl(req.route.path, req)) {
+    res.status(405).json({ error: 'Not allowed' });
+    return;
+  }
+
+  try {
+    const query = await db.query(
+      `
+                SELECT id, user_name
+                FROM users
+                WHERE id != $1
+                AND user_role = 'user'
+                AND user_name ILIKE $2
+                AND id NOT IN (
+                    SELECT user_id
+                    FROM chat_users
+                    WHERE chat_id = $3
+                )
+                ORDER BY user_name asc
+                limit 10
+            `,
+      [req.session.user.id, `%${req.query.username}%`, req.query.chatId]
+    );
+
+    res.status(200).json({ success: true, result: query.rows });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+};
+
 // BLOCK USER
 const blockUser = async (req, res) => {
   if (!req.params.id) {
@@ -339,6 +371,30 @@ const acceptChatInvite = async (req, res) => {
     res.status(500).json({ success: false, error: err.message });
   }
 };
+// GET INVITES
+const getInvites = async (req, res) => {
+  if (!acl(req.route.path, req)) {
+    res.status(405).json({ error: 'Not allowed' });
+    return;
+  }
+
+  try {
+    const query = await db.query(
+      `
+                SELECT chats.id, chats.created_by, chats.subject
+                FROM chats, chat_users
+                WHERE chats.id = chat_users.chat_id
+                AND chat_users.user_id = $1
+                AND chat_users.invitation_accepted = false
+            `,
+      [req.session.user.id]
+    );
+
+    res.status(200).json({ success: true, result: query.rows });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+};
 // BAN FROM CHAT
 const banFromChat = async (req, res) => {
   if (!req.query.chatId || !req.query.userId) {
@@ -415,6 +471,8 @@ module.exports = {
   logoutUser,
   fetchUser,
   getAllUsers,
+  searchUsers,
+  getInvites,
   blockUser,
   getChats,
   getChatUsers,

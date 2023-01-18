@@ -19,7 +19,10 @@ router.get('/fetch-user', controller.fetchUser);
 // FETCH ALL OUR USERS
 router.get('/get-all-users', controller.getAllUsers);
 
+// SEARCH FOR USERS TO INVITE
+router.get('/user/search', controller.searchUsers);
 // BLOCK A USER - DONE - Y (men minus :id)
+
 router.post('/user/block/:id', controller.blockUser);
 
 // GET ALL TITLES AND ID FROM ALL THE CHATS - DONE -Y
@@ -35,7 +38,10 @@ router.post('/chat/create', controller.createChat);
 router.post('/chat/invite', controller.inviteToChat);
 
 // ACCEPT INVITE TO CHAT - Y
-router.post('/chat/accept-invite/:id', controller.acceptChatInvite);
+router.put('/chat/accept-invite/:id', controller.acceptChatInvite);
+
+// RECIEVE INVITATIONS TO CHAT
+router.get('/chat/invites', controller.getInvites);
 
 // BAN FROM CHAT - DONE - Y
 router.post('/chat/ban', controller.banFromChat);

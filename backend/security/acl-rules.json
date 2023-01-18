@@ -23,6 +23,12 @@
     "/get-all-users": {
       "get": true
     },
+    "/user/search": {
+      "get": true
+    },
+    "/chat/invites": {
+      "get": true
+    },
     "/chat": {
       "get": true
     },
@@ -31,9 +37,6 @@
     },
     "/chat/invite": {
       "post": true,
-      "get": true
-    },
-    "/chat/invites": {
       "get": true
     },
     "/chat/accept-invite/:id": {
