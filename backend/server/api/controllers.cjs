@@ -445,9 +445,15 @@ const sendMessage = async (req, res) => {
   try {
     let message = req.body;
     message.timestamp = Date.now();
+    await db.query(
+      `
+      INSERT INTO messages(chat_id, from_id, content, message_timestamp)
+      VALUES($1, $2, $3, to_timestamp($4 / 1000.0))
+      `,
+      [req.body.chatId, req.body.fromId, req.body.content, message.timestamp]
+    );
     broadcast('new-message', message);
     res.send('ok');
-    // just nu sparas meddelande i broadcast.
   } catch (err) {
     res.status(500).json({ success: false, error: err.message });
   }
