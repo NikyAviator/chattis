@@ -1,14 +1,17 @@
 import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
 import axios from 'axios';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Container, Row, Col, Card } from 'react-bootstrap';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 function Signup() {
   const [username, setUserName] = useState('');
   const [password, setPassword] = useState('');
   const [validPassword, setValidPassword] = useState(false);
+  const [confirm, setConfirm] = useState('');
+  const [validConfirm, setValidConfirm] = useState(false);
+  const navigate = useNavigate();
 
   const validatePassword = (e) => {
     const regex = /^(?=.*[\d!#$%&? "])(?=.*[A-Z])[a-zA-Z0-9!#$%&?]{8,}/;
@@ -21,6 +24,16 @@ function Signup() {
       setPassword(e.target.value);
     }
   };
+
+  function handleConfirmInput(event) {
+    setConfirm(event.target.value);
+  }
+  useEffect(() => {
+    const passWordCheck = () => {
+      setValidConfirm(password === confirm);
+    };
+    passWordCheck();
+  }, [password, confirm]);
 
   function onSubmitRegister(event) {
     event.preventDefault();
@@ -35,6 +48,7 @@ function Signup() {
     alert('Account registered!');
     setUserName('');
     setPassword('');
+    navigate('/login');
   }
 
   return (
@@ -55,28 +69,41 @@ function Signup() {
                     placeholder='username'
                   />
                 </Form.Group>
-                <Form.Group
-                  onChange={(event) => {
-                    setPassword(event.target.value);
-                  }}
-                  className='mb-3'
-                >
+                <Form.Group className='mb-3'>
                   <Form.Label>Password:</Form.Label>
                   <Form.Label>
                     ( Min 8 chars, Capitalize one letter and min one
                     number/special char)
                   </Form.Label>
-                  <Form.Control type='text' placeholder='Password' />
+                  <Form.Control
+                    onChange={validatePassword}
+                    type='password'
+                    placeholder='Password'
+                    style={
+                      !validPassword
+                        ? { borderColor: 'red' }
+                        : { borderColor: 'blue' }
+                    }
+                  />
                 </Form.Group>
-                <Form.Group onChange={validatePassword} className='mb-3'>
+                <Form.Group className='mb-3'>
                   <Form.Label>Retype your password:</Form.Label>
-                  <Form.Control type='text' placeholder='Password' />
+                  <Form.Control
+                    onChange={handleConfirmInput}
+                    type='password'
+                    placeholder='Password'
+                    style={
+                      !validConfirm || !validPassword
+                        ? { borderColor: 'red' }
+                        : { borderColor: 'blue' }
+                    }
+                  />
                 </Form.Group>
                 <Button
                   variant='primary'
                   type='submit'
                   className='mx-auto'
-                  disabled={validPassword ? false : true}
+                  disabled={validConfirm && validPassword ? false : true}
                 >
                   Register
                 </Button>

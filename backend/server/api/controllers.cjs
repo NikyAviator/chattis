@@ -57,6 +57,11 @@ function broadcast(event, data) {
 // CREATE USER
 const createUser = async (req, res) => {
   const { username, password } = req.body;
+  const regex = /^(?=.*[\d!#$%&? "])(?=.*[A-Z])[a-zA-Z0-9!#$%&?]{8,}/;
+  if (!regex.test(req.body.password)) {
+    res.status(403).json({ success: false, error: 'Incorrect Password!' });
+    return;
+  }
 
   if (username == null || password == null) {
     return res.status(403);
