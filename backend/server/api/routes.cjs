@@ -42,7 +42,8 @@ router.put('/chat/accept-invite/:id', controller.acceptChatInvite);
 
 // RECIEVE INVITATIONS TO CHAT
 router.get('/chat/invites', controller.getInvites);
-
+// GET CHAT MESSAGES
+router.get('/chat/messages/:id', controller.getChatMessages);
 // BAN FROM CHAT - DONE - Y
 router.post('/chat/ban', controller.banFromChat);
 

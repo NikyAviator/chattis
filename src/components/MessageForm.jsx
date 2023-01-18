@@ -38,9 +38,22 @@ const MessageForm = ({ selectedChat, setSelectedChatCallback, userData }) => {
       setMessage('');
     });
   };
+  // render and get the chats written for each room
+  const getChatMessages = async (chat_id) => {
+    await axios
+      .get(`/api/chat/messages/${chat_id}`)
+      .then((res) => {
+        setMessages(res.data.result);
+        console.log(res.data.result);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
 
   useEffect(() => {
     startSSE();
+    getChatMessages(selectedChat.chat_id);
     //}, [messages]);
   }, []);
 

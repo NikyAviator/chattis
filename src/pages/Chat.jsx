@@ -40,6 +40,7 @@ const Chat = ({ setUserCallback }) => {
           <Sidebar
             setUserCallback={setUserCallback}
             setSelectedChatCallback={setChat}
+            selectedChat={selectedChat}
           />
         </Col>
         <Col md={8}>

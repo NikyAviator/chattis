@@ -465,6 +465,34 @@ const getChatMessages = async (req, res) => {
   }
 
   try {
+    const query = await db.query(
+      `
+      SELECT users.user_name AS "from",
+                    messages.id,
+                    messages.content,
+                    messages.message_timestamp AS "timestamp",
+                    messages.from_id AS "fromId"
+                FROM users, messages
+                WHERE users.id = messages.from_id
+                AND messages.chat_id = $1 
+                AND EXISTS(
+                    SELECT id 
+                    FROM chat_users
+                    WHERE chat_id = $1
+                    AND user_id = $2
+                    AND blocked != true
+                    OR EXISTS(
+                        SELECT id
+                        FROM users
+                        WHERE id = $2
+                        AND user_role = 'superadmin'
+                    )
+                )
+                ORDER BY timestamp ASC
+      `,
+      [req.params.id, req.session.user.id]
+    );
+    res.status(200).json({ success: true, result: query.rows });
   } catch (err) {
     res.status(500).json({ success: false, error: err.message });
   }

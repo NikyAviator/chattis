@@ -4,7 +4,11 @@ import React, { useState, useEffect } from 'react';
 import { ListGroup } from 'react-bootstrap';
 import CreateChat from './CreateChat';
 
-const Sidebar = ({ setUserCallback, setSelectedChatCallback }) => {
+const Sidebar = ({
+  setUserCallback,
+  setSelectedChatCallback,
+  selectedChat,
+}) => {
   const [rooms, setRooms] = useState([]);
   const [membersList, setMembersList] = useState([]);
   const [createChat, setCreateChat] = useState(false);
@@ -109,19 +113,21 @@ const Sidebar = ({ setUserCallback, setSelectedChatCallback }) => {
         </Modal>
       )}
       {createChat && <CreateChat setChatCallback={setRooms} />}
-      <ListGroup>
-        {rooms.length > 0 &&
-          rooms.map((room, index) => (
-            <ListGroup.Item
-              action
-              variant='light'
-              key={index}
-              onClick={() => setSelectedChatCallback(room)}
-            >
-              {room.subject}
-            </ListGroup.Item>
-          ))}
-      </ListGroup>
+      {!selectedChat && (
+        <ListGroup>
+          {rooms.length > 0 &&
+            rooms.map((room, index) => (
+              <ListGroup.Item
+                action
+                variant='light'
+                key={index}
+                onClick={() => setSelectedChatCallback(room)}
+              >
+                {room.subject}
+              </ListGroup.Item>
+            ))}
+        </ListGroup>
+      )}
       <h3>All Registered Chattis users:</h3>
       <ListGroup>
         {membersList.map((members, index) => (
