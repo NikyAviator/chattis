@@ -180,6 +180,7 @@ const MessageForm = ({ selectedChat, setSelectedChatCallback, userData }) => {
         </>
       )}
       <Button
+        variant='danger'
         onClick={() => {
           setSelectedChatCallback(null);
         }}

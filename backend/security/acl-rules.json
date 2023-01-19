@@ -32,6 +32,9 @@
     "/chats": {
       "get": true
     },
+    "/chat/users": {
+      "get": true
+    },
     "/chat/create": {
       "post": true
     },
