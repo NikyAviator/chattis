@@ -78,6 +78,7 @@ const MessageForm = ({ selectedChat, setSelectedChatCallback, userData }) => {
   }
   console.log(selectedChat);
 
+  // search for users to invite in the chat
   useEffect(() => {
     const getUsers = () => {
       axios
