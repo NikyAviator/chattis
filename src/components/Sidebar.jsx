@@ -50,22 +50,29 @@ const Sidebar = ({
 
   return (
     <>
+      <Row>
+        <Col xs='5'>
+          <Button
+            onClick={() => {
+              setCreateChat(!createChat);
+            }}
+          >
+            Create Chat
+          </Button>
+        </Col>
+        <Col xs='6'>
+          <Button
+            onClick={() => {
+              setShowChatInvitations(true);
+            }}
+            disabled={chatInvitation.length == 0 ? true : false}
+          >
+            Pending Invites: {chatInvitation.length}
+          </Button>
+        </Col>
+      </Row>
       <h3>Available rooms:</h3>
-      <Button
-        onClick={() => {
-          setCreateChat(!createChat);
-        }}
-      >
-        Create Chat
-      </Button>
-      <Button
-        onClick={() => {
-          setShowChatInvitations(true);
-        }}
-        disabled={chatInvitation.length == 0 ? true : false}
-      >
-        Pending Invites: {chatInvitation.length}
-      </Button>
+
       {showChatInvitations && (
         <Modal show={showChatInvitations}>
           <Modal.Header className='text-center'>
@@ -113,21 +120,23 @@ const Sidebar = ({
         </Modal>
       )}
       {createChat && <CreateChat setChatCallback={setRooms} />}
-      {!selectedChat && (
-        <ListGroup>
-          {rooms.length > 0 &&
-            rooms.map((room, index) => (
-              <ListGroup.Item
-                action
-                variant='light'
+      {!selectedChat &&
+        rooms.length > 0 &&
+        rooms.map((room, index) => (
+          <Row className='my-3'>
+            <Col xs='4'>
+              <Button
+                disabled={room.blocked ? true : false}
+                variant={room.blocked ? 'danger' : 'secondary'}
                 key={index}
                 onClick={() => setSelectedChatCallback(room)}
               >
                 {room.subject}
-              </ListGroup.Item>
-            ))}
-        </ListGroup>
-      )}
+              </Button>
+            </Col>
+          </Row>
+        ))}
+
       <h3>All Registered Chattis users:</h3>
       <ListGroup>
         {membersList.map((members, index) => (

@@ -443,7 +443,8 @@ const banFromChat = async (req, res) => {
        SET blocked = NOT blocked
        WHERE chat_id = $1
        AND user_id = $2 
-      `[(req.query.chatId, req.query.userId)]
+      `,
+      [req.query.chatId, req.query.userId]
     );
     res.status(200).json({
       success: true,

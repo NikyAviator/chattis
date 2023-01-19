@@ -9,6 +9,8 @@ const MessageForm = ({ selectedChat, setSelectedChatCallback, userData }) => {
   const [searchedUsername, setSearchedUsername] = useState('');
   const [message, setMessage] = useState('');
   const [messages, setMessages] = useState([]);
+  const [toggleBlock, setToggleBlock] = useState(false);
+
   const startSSE = () => {
     // workaround for being called twice in React.StrictMode
     // close the old sse connection if it exists...
@@ -97,6 +99,48 @@ const MessageForm = ({ selectedChat, setSelectedChatCallback, userData }) => {
 
   return (
     <>
+      <Modal show={toggleBlock} backdrop='static' centered>
+        <Modal.Header className='text-center'>
+          <h2>Edit chat</h2>
+        </Modal.Header>
+        <Modal.Body>
+          {console.log('UserList:', userList)}
+          {userList.length > 0 &&
+            userList.map((user, id) => (
+              <Row className='text-center align-items-center m-2' key={id}>
+                <Col>{user.user_name}</Col>
+                <Col>
+                  <Button
+                    variant={!user.blocked ? 'success' : 'danger'}
+                    onClick={(e) => {
+                      axios
+                        .put(
+                          `api/chat/ban?chatId=${selectedChat.chat_id}&userId=${user.id}`
+                        )
+                        .then((response) => {
+                          console.log(response.data);
+                        })
+                        .catch((error) => {
+                          console.log(error);
+                        });
+
+                      /* e.target.disabled = true */
+                      e.target.textContent = '✔️';
+                      e.target.style.backgroundColor = 'blue';
+                    }}
+                  >
+                    {!user.blocked ? '🏴 Ban' : '🏳️ Unban'}
+                  </Button>
+                </Col>
+              </Row>
+            ))}
+        </Modal.Body>
+        <Modal.Footer>
+          <Button className='bg-success' onClick={() => setToggleBlock(false)}>
+            🚫 Close
+          </Button>
+        </Modal.Footer>
+      </Modal>
       <div>You are in chat: {selectedChat.subject}</div>
       {((userData && selectedChat && userData.id === selectedChat.created_by) ||
         userData.userRole === 'admin') && (
@@ -116,7 +160,23 @@ const MessageForm = ({ selectedChat, setSelectedChatCallback, userData }) => {
           >
             Invite people
           </Button>
-          <Button>Block user</Button>
+          <Button
+            onClick={() => {
+              setToggleBlock(true);
+              axios
+                .get('/api/chat/users', {
+                  params: { chatId: selectedChat.chat_id },
+                })
+                .then((response) => {
+                  setUserList(response.data.result);
+                })
+                .catch((err) => {
+                  console.log(err);
+                });
+            }}
+          >
+            Block user
+          </Button>
         </>
       )}
       <Button
