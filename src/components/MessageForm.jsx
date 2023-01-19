@@ -75,6 +75,7 @@ const MessageForm = ({ selectedChat, setSelectedChatCallback, userData }) => {
       .catch((err) => {
         console.log(err);
       });
+    getChatMessages(selectedChat.chat_id);
   }
   console.log(selectedChat);
 
@@ -252,7 +253,23 @@ const MessageForm = ({ selectedChat, setSelectedChatCallback, userData }) => {
                     : 'messageOther my-1 px-1'
                 }
               >
-                <Col>{message.from}</Col>
+                <Col>
+                  {message.from}
+                  {userData.userRole === 'admin' && (
+                    <Button
+                      onClick={async () => {
+                        await axios.delete(
+                          `/api/chat/delete-message/${message.id}`
+                        );
+                        getChatMessages(selectedChat.chat_id);
+                      }}
+                      className='mx-3'
+                      variant='danger'
+                    >
+                      delete
+                    </Button>
+                  )}
+                </Col>
                 <Col>
                   @ ⏲{' '}
                   {new Date(message.timestamp)

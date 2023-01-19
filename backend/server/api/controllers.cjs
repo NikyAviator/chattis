@@ -525,6 +525,14 @@ const deleteMessage = async (req, res) => {
   }
 
   try {
+    const query = await db.query(
+      `
+      DELETE FROM messages
+      WHERE id = $1
+      `,
+      [req.params.id]
+    );
+    res.status(200).json({ success: true, result: 'Message deleted!' });
   } catch (err) {
     res.status(500).json({ success: false, error: err.message });
   }
