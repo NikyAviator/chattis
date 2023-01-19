@@ -150,7 +150,9 @@ const MessageForm = ({ selectedChat, setSelectedChatCallback, userData }) => {
             onClick={() => {
               setShowInvitePeople(true);
               axios
-                .get('/api/get-all-users')
+                .get(
+                  `/api/user/search?username=${searchedUsername}&chatId=${selectedChat.chat_id}`
+                )
                 .then((response) => {
                   setUserList(response.data.result);
                   console.log(response.data);
