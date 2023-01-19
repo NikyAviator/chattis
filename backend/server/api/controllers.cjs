@@ -254,26 +254,41 @@ const blockUser = async (req, res) => {
 // GET CHATS-CREATED GROUP
 const getChats = async (req, res) => {
   // TODO PROBLEM
-  // if (!acl(req.route.path, req)) {
-  //   res.status(405).json({ error: 'Not allowed' });
-  //   return;
-  // }
+  if (!acl(req.route.path, req)) {
+    res.status(405).json({ error: 'Not allowed' });
+    return;
+  }
+  if (req.session.user.user_role === 'admin') {
+    try {
+      const query = await db.query(
+        `
+      SELECT id AS chat_id, subject, created_by
+      FROM chats
+      `,
+        [req.session.user.id]
+      );
 
-  try {
-    const query = await db.query(
-      `
+      res.status(200).json({ success: true, result: query.rows });
+    } catch (err) {
+      res.status(500).json({ success: false, error: err.message });
+    }
+  } else {
+    try {
+      const query = await db.query(
+        `
       SELECT *
       FROM chats, chat_users
       WHERE chats.id = chat_users.chat_id
       AND chat_users.user_id = $1
       AND chat_users.invitation_accepted = true
       `,
-      [req.session.user.id]
-    );
+        [req.session.user.id]
+      );
 
-    res.status(200).json({ success: true, result: query.rows });
-  } catch (err) {
-    res.status(500).json({ success: false, error: err.message });
+      res.status(200).json({ success: true, result: query.rows });
+    } catch (err) {
+      res.status(500).json({ success: false, error: err.message });
+    }
   }
 };
 
@@ -490,7 +505,7 @@ const getChatMessages = async (req, res) => {
                         SELECT id
                         FROM users
                         WHERE id = $2
-                        AND user_role = 'superadmin'
+                        AND user_role = 'admin'
                     )
                 )
                 ORDER BY timestamp ASC

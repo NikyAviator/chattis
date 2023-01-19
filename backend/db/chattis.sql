@@ -76,3 +76,6 @@ CREATE TRIGGER t_create_chat
     AFTER INSERT ON chats
     FOR EACH ROW
     EXECUTE PROCEDURE f_insert_chat_creator();
+
+-- To become an admin, write the following SQL command:
+-- update users set user_role = 'admin' where user_name = 'YOURUSERNAME';

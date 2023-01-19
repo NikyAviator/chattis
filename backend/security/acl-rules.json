@@ -29,7 +29,7 @@
     "/chat/invites": {
       "get": true
     },
-    "/chat": {
+    "/chats": {
       "get": true
     },
     "/chat/create": {
@@ -58,16 +58,55 @@
       "post": true
     }
   },
-  "superadmin": {
-    "/user/users": {
-      "get": true,
-      "post": true,
-      "put": true,
+  "admin": {
+    "/fetch-user": {
+      "get": true
+    },
+    "/get-all-users": {
+      "get": true
+    },
+    "/user/logout": {
       "delete": true
     },
-    "/login": {
-      "get": true,
+    "/user/search": {
+      "get": true
+    },
+    "/user/block/:id": {
+      "post": true
+    },
+    "/chats": {
+      "get": true
+    },
+    "/chat/create": {
+      "post": true
+    },
+    "/chat/invite": {
+      "post": true,
+      "get": true
+    },
+    "/chat/users": {
+      "get": true
+    },
+    "/chat/invites": {
+      "get": true
+    },
+    "/chat/accept-invite/:id": {
+      "put": true
+    },
+    "/chat/ban": {
+      "put": true
+    },
+    "/chat/message": {
+      "post": true
+    },
+    "/chat/messages/:id": {
+      "get": true
+    },
+    "/chat/delete-message/:id": {
       "delete": true
+    },
+    "/chat/disconnect": {
+      "post": true
     }
   }
 }

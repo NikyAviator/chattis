@@ -98,22 +98,27 @@ const MessageForm = ({ selectedChat, setSelectedChatCallback, userData }) => {
   return (
     <>
       <div>You are in chat: {selectedChat.subject}</div>
-      <Button
-        onClick={() => {
-          setShowInvitePeople(true);
-          axios
-            .get('/api/get-all-users')
-            .then((response) => {
-              setUserList(response.data.result);
-              console.log(response.data);
-            })
+      {((userData && selectedChat && userData.id === selectedChat.created_by) ||
+        userData.userRole === 'admin') && (
+        <>
+          <Button
+            onClick={() => {
+              setShowInvitePeople(true);
+              axios
+                .get('/api/get-all-users')
+                .then((response) => {
+                  setUserList(response.data.result);
+                  console.log(response.data);
+                })
 
-            .catch((err) => console.log(err.message));
-        }}
-      >
-        Invite people
-      </Button>
-      <Button>Block user</Button>
+                .catch((err) => console.log(err.message));
+            }}
+          >
+            Invite people
+          </Button>
+          <Button>Block user</Button>
+        </>
+      )}
       <Button
         onClick={() => {
           setSelectedChatCallback(null);
