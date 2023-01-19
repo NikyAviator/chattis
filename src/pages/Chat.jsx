@@ -41,6 +41,7 @@ const Chat = ({ setUserCallback }) => {
             setUserCallback={setUserCallback}
             setSelectedChatCallback={setChat}
             selectedChat={selectedChat}
+            userData={user}
           />
         </Col>
         <Col md={8}>

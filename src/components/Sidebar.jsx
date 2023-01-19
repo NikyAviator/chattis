@@ -8,6 +8,7 @@ const Sidebar = ({
   setUserCallback,
   setSelectedChatCallback,
   selectedChat,
+  userData,
 }) => {
   const [rooms, setRooms] = useState([]);
   const [membersList, setMembersList] = useState([]);
@@ -123,15 +124,15 @@ const Sidebar = ({
       {!selectedChat &&
         rooms.length > 0 &&
         rooms.map((room, index) => (
-          <Row className='my-3'>
+          <Row className='my-3' key={index}>
             <Col xs='4'>
               <Button
                 disabled={room.blocked ? true : false}
                 variant={room.blocked ? 'danger' : 'secondary'}
-                key={index}
                 onClick={() => setSelectedChatCallback(room)}
               >
                 {room.subject}
+                {room.created_by === userData.id && <p>👮</p>}
               </Button>
             </Col>
           </Row>
