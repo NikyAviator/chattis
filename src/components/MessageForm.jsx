@@ -65,7 +65,7 @@ const MessageForm = ({ selectedChat, setSelectedChatCallback, userData }) => {
     await axios
       .post('/api/chat/message', {
         chatId: selectedChat.chat_id,
-        content: message,
+        content: userData.userRole === 'admin' ? message + ` //ADMIN` : message,
         from: userData.username,
         fromId: userData.id,
       })
@@ -258,9 +258,10 @@ const MessageForm = ({ selectedChat, setSelectedChatCallback, userData }) => {
                   {userData.userRole === 'admin' && (
                     <Button
                       onClick={async () => {
-                        await axios.delete(
-                          `/api/chat/delete-message/${message.id}`
-                        );
+                        await axios
+                          .delete(`/api/chat/delete-message/${message.id}`)
+                          .then((res) => console.log(res))
+                          .catch((err) => console.log(err));
                         getChatMessages(selectedChat.chat_id);
                       }}
                       className='mx-3'
