@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { Button, Modal, Row, Col } from 'react-bootstrap';
+import { Button, Modal, Row, Col, Container } from 'react-bootstrap';
 import React, { useState, useEffect } from 'react';
 import { ListGroup } from 'react-bootstrap';
 import CreateChat from './CreateChat';
@@ -49,29 +49,113 @@ const Sidebar = ({
     getAllUsers();
   }, []);
 
+  const sortByChatsByName = () => {
+    let sortedChats = rooms.sort((a, b) => {
+      const chatSubjectA = a.subject.toUpperCase();
+      const chatSubjectB = b.subject.toUpperCase();
+      if (chatSubjectA < chatSubjectB) {
+        return -1;
+      }
+      if (chatSubjectA > chatSubjectB) {
+        return 1;
+      }
+      return 0;
+    });
+    setRooms([]);
+    setRooms([...sortedChats]);
+  };
+  const sortChatsByLatestMessage = () => {
+    let sortedChats = rooms.sort((a, b) => {
+      const msgTimestampA = new Date(a.last_message_timestamp);
+      const msgTimestampB = new Date(b.last_message_timestamp);
+      if (msgTimestampA > msgTimestampB) {
+        return -1;
+      }
+      if (msgTimestampA < msgTimestampB) {
+        return 1;
+      }
+      return 0;
+    });
+    setRooms([]);
+    setRooms([...sortedChats]);
+  };
+
+  const sortChatsByUsersLatestMessage = () => {
+    let sortedChats = rooms.sort((a, b) => {
+      const msgTimestampA = new Date(a.user_latest_message_timestamp);
+      const msgTimestampB = new Date(b.user_latest_message_timestamp);
+      if (msgTimestampA > msgTimestampB) {
+        return -1;
+      }
+      if (msgTimestampA < msgTimestampB) {
+        return 1;
+      }
+      return 0;
+    });
+    setRooms([]);
+    setRooms([...sortedChats]);
+  };
+
   return (
     <>
-      <Row>
-        <Col xs='5'>
-          <Button
-            onClick={() => {
-              setCreateChat(!createChat);
-            }}
-          >
-            Create Chat
-          </Button>
-        </Col>
-        <Col xs='6'>
-          <Button
-            onClick={() => {
-              setShowChatInvitations(true);
-            }}
-            disabled={chatInvitation.length == 0 ? true : false}
-          >
-            Pending Invites: {chatInvitation.length}
-          </Button>
-        </Col>
-      </Row>
+      <Container>
+        <Row>
+          <Col xs='5'>
+            <Button
+              onClick={() => {
+                setCreateChat(!createChat);
+              }}
+            >
+              Create Chat
+            </Button>
+          </Col>
+          <Col xs='6'>
+            <Button
+              onClick={() => {
+                setShowChatInvitations(true);
+              }}
+              disabled={chatInvitation.length === 0 ? true : false}
+            >
+              Pending Invites: {chatInvitation.length}
+            </Button>
+          </Col>
+        </Row>
+        <Row>
+          <Col className='my-1 mb-0'>
+            <p>Sort rooms by:</p>
+          </Col>
+        </Row>
+        <Row>
+          <Col>
+            <Button
+              onClick={() => {
+                sortByChatsByName();
+              }}
+              variant='primary'
+            >
+              Name
+            </Button>
+          </Col>
+          <Col>
+            <Button
+              onClick={() => {
+                sortChatsByLatestMessage();
+              }}
+            >
+              latest message
+            </Button>
+          </Col>
+          <Col>
+            <Button
+              onClick={() => {
+                sortChatsByUsersLatestMessage();
+              }}
+            >
+              my last messages
+            </Button>
+          </Col>
+        </Row>
+      </Container>
       <h3>Available rooms:</h3>
 
       {showChatInvitations && (

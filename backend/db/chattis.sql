@@ -79,3 +79,6 @@ CREATE TRIGGER t_create_chat
 
 -- To become an admin, write the following SQL command:
 -- update users set user_role = 'admin' where user_name = 'YOURUSERNAME';
+
+-- lastmessage sent view
+CREATE VIEW lastmessage AS SELECT chats.id AS chat_id, MAX(messages.message_timestamp) AS last_message_timestamp FROM chats, messages WHERE chats.id = messages.chat_id GROUP BY(chats.id);

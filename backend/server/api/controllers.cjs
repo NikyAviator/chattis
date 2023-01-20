@@ -258,12 +258,25 @@ const getChats = async (req, res) => {
     res.status(405).json({ error: 'Not allowed' });
     return;
   }
+  // get all the rooms as admin
   if (req.session.user.user_role === 'admin') {
     try {
       const query = await db.query(
         `
-      SELECT id AS chat_id, subject, created_by
-      FROM chats
+        WITH userlastmessage AS(SELECT chats.id AS chat_id, messages.message_timestamp, messages.from_id FROM chats, messages WHERE chats.id = messages.chat_id AND from_id = $1)
+      SELECT id AS chat_id, subject, created_by,
+        lastmessage.last_message_timestamp, 
+            userlatestmessage.user_latest_message_timestamp
+          FROM chats
+          LEFT JOIN lastmessage
+          ON chats.id = lastmessage.chat_id
+          LEFT JOIN(
+              SELECT chat_id, 
+                  MAX(message_timestamp) AS "user_latest_message_timestamp"
+              FROM userlastmessage
+              GROUP BY(chat_id)
+          ) userlatestmessage
+          ON userlatestmessage.chat_id = chats.id
       `,
         [req.session.user.id]
       );
@@ -273,14 +286,34 @@ const getChats = async (req, res) => {
       res.status(500).json({ success: false, error: err.message });
     }
   } else {
+    // get all the rooms a user is invited to or has created
     try {
       const query = await db.query(
         `
-      SELECT *
-      FROM chats, chat_users
-      WHERE chats.id = chat_users.chat_id
-      AND chat_users.user_id = $1
-      AND chat_users.invitation_accepted = true
+      WITH userlastmessage AS(
+          SELECT chats.id AS chat_id,
+              messages.message_timestamp, messages.from_id
+          FROM chats, messages
+          WHERE chats.id = messages.chat_id
+          AND from_id = $1
+      )
+      SELECT c.id AS "chat_id", c.created_by, c.subject,
+          cu.user_id, cu.blocked, cu.invitation_accepted,
+          lm.last_message_timestamp, 
+          user_latest_message.user_latest_message_timestamp
+      FROM chat_users cu, chats c
+          LEFT JOIN lastmessage lm
+          ON c.id = lm.chat_id
+      LEFT JOIN(
+          SELECT chat_id, 
+              MAX(message_timestamp) AS "user_latest_message_timestamp"
+          FROM userlastmessage
+          GROUP BY(chat_id)
+      ) user_latest_message
+      ON user_latest_message.chat_id = c.id
+      WHERE c.id = cu.chat_id
+      AND cu.user_id = $1
+      AND cu.invitation_accepted = true
       `,
         [req.session.user.id]
       );
