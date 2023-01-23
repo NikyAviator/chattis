@@ -32,7 +32,6 @@ function Navigation({ userData, setUserCallback }) {
             <LinkContainer to='/chat'>
               <Nav.Link>Chat</Nav.Link>
             </LinkContainer>
-            {console.log(userData)}
             {!userData ? (
               <LinkContainer to='/login'>
                 <Nav.Link> Log in</Nav.Link>

@@ -10,7 +10,6 @@ const Chat = ({ setUserCallback }) => {
 
   const setChat = (chatvalue) => {
     setSelectedChat(chatvalue);
-    console.log('hej');
   };
 
   useEffect(() => {

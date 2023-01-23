@@ -259,7 +259,7 @@ const getChats = async (req, res) => {
     return;
   }
   // get all the rooms as admin
-  if (req.session.user.user_role === 'admin') {
+  if (req.session.user.userRole === 'admin') {
     try {
       const query = await db.query(
         `
@@ -280,7 +280,6 @@ const getChats = async (req, res) => {
       `,
         [req.session.user.id]
       );
-
       res.status(200).json({ success: true, result: query.rows });
     } catch (err) {
       res.status(500).json({ success: false, error: err.message });

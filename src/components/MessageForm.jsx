@@ -77,7 +77,6 @@ const MessageForm = ({ selectedChat, setSelectedChatCallback, userData }) => {
       });
     getChatMessages(selectedChat.chat_id);
   }
-  console.log(selectedChat);
 
   // search for users to invite in the chat
   useEffect(() => {
@@ -106,7 +105,6 @@ const MessageForm = ({ selectedChat, setSelectedChatCallback, userData }) => {
           <h2>Edit chat</h2>
         </Modal.Header>
         <Modal.Body>
-          {console.log('UserList:', userList)}
           {userList.length > 0 &&
             userList.map((user, id) => (
               <Row className='text-center align-items-center m-2' key={id}>
@@ -156,7 +154,6 @@ const MessageForm = ({ selectedChat, setSelectedChatCallback, userData }) => {
                 )
                 .then((response) => {
                   setUserList(response.data.result);
-                  console.log(response.data);
                 })
 
                 .catch((err) => console.log(err.message));

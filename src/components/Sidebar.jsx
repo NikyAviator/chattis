@@ -33,7 +33,6 @@ const Sidebar = ({
 
   const getChats = async () => {
     await axios.get('/api/chats').then((res) => {
-      console.log(res.data.result);
       setRooms(res.data.result);
     });
   };
@@ -41,7 +40,6 @@ const Sidebar = ({
   useEffect(() => {
     const getAllUsers = async () => {
       await axios.get('/api/get-all-users').then((res) => {
-        console.log(res.data.result);
         setMembersList(res.data.result);
       });
     };
@@ -168,7 +166,6 @@ const Sidebar = ({
               chatInvitation.map((chat, id) => (
                 <Row className='text-center align-items-center m-2' key={id}>
                   <Col>{chat.subject}</Col>
-                  {console.log(chat)}
                   <Col>
                     <Button
                       variant='success'
@@ -216,7 +213,7 @@ const Sidebar = ({
                 onClick={() => setSelectedChatCallback(room)}
               >
                 {room.subject}
-                {room.created_by === userData.id && <p>👮</p>}
+                {room.created_by === userData?.id && <p>👮</p>}
               </Button>
             </Col>
           </Row>
