@@ -11,21 +11,17 @@ const api_url = process.env.API_URL;
 const server = express();
 
 // salt for cookie hash generation
-let salt = 'someUnusualStringThatIsUniqueForThisProject';
+let salt;
 
 // if we are running in production mode and no password salt or short password salt exit
-if (process.env.PRODUCTION) {
-  if (!process.env.COOKIE_SALT) {
-    console.log(
-      'Shutting down, in production and missing env. variable COOKIE_SALT'
-    );
-    process.exit();
-  } else if (process.env.COOKIE_SALT.length < 32) {
-    console.log('Shutting down, env. variable COOKIE_SALT too short.');
-    process.exit();
-  } else {
-    salt = process.env.COOKIE_SALT;
-  }
+if (!process.env.COOKIE_SALT) {
+  console.log('NOT Using .env COOKIE_SALT, shutting down');
+  process.exit();
+} else if (process.env.COOKIE_SALT.length < 32) {
+  console.log('.env variable COOKIE_SALT too short!');
+  process.exit();
+} else {
+  salt = process.env.COOKIE_SALT;
 }
 
 const store = new (require('connect-pg-simple')(session))({
