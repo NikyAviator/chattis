@@ -48,9 +48,13 @@ function broadcast(event, data) {
   // loop through all open connections and send
   // some data without closing the connection (res.write)
   //for (let res of connections) {
-  for (let res of connections[data.chatId]) {
-    // syntax for a SSE message: 'event: message \ndata: "the-message" \n\n'
-    res.write('event:' + event + '\ndata:' + JSON.stringify(data) + '\n\n');
+  try {
+    for (let res of connections[data.chatId]) {
+      // syntax for a SSE message: 'event: message \ndata: "the-message" \n\n'
+      res.write('event:' + event + '\ndata:' + JSON.stringify(data) + '\n\n');
+    }
+  } catch (err) {
+    console.log(err.message);
   }
 }
 
@@ -58,13 +62,21 @@ function broadcast(event, data) {
 const createUser = async (req, res) => {
   const { username, password } = req.body;
   const regex = /^(?=.*[\d!#$%&? "])(?=.*[A-Z])[a-zA-Z0-9!#$%&?]{8,}/;
-  if (!regex.test(req.body.password)) {
-    res.status(403).json({ success: false, error: 'Incorrect Password!' });
-    return;
-  }
+  // if (!regex.test(req.body.password)) {
+  //   res.status(403).json({ success: false, error: 'Incorrect Password!' });
+  //   return;
+  // }
 
-  if (username == null || password == null) {
-    return res.status(403);
+  if (
+    !username ||
+    (username && username.length > 30) ||
+    !password ||
+    (password && password.length > 40) ||
+    !password.match(regex)
+  ) {
+    return res
+      .status(403)
+      .json({ success: false, error: 'Incorrect Parameters' });
   }
   if (!acl(req.route.path, req)) {
     res.status(405).json({ error: 'Not allowed' });
@@ -253,7 +265,6 @@ const blockUser = async (req, res) => {
 };
 // GET CHATS-CREATED GROUP
 const getChats = async (req, res) => {
-  // TODO PROBLEM
   if (!acl(req.route.path, req)) {
     res.status(405).json({ error: 'Not allowed' });
     return;
@@ -354,11 +365,9 @@ const getChatUsers = async (req, res) => {
 
 // CREATE CHAT
 const createChat = async (req, res) => {
-  console.log(req.route.path);
-  console.log(req.session.user);
-
-  if (!req.body.subject) {
+  if (!req.body.subject || (req.body.subject && req.body.subject.length > 50)) {
     res.status(500).json({ success: false, error: 'Incorrect parameters' });
+    return;
   }
   if (!acl(req.route.path, req)) {
     res.status(405).json({ error: 'Not allowed' });
@@ -488,25 +497,48 @@ const banFromChat = async (req, res) => {
 };
 // SEND A MESSAGE
 const sendMessage = async (req, res) => {
-  if (!req.body) {
+  if (!req.body.content || !req.body.chatId || req.body.content.length > 1000) {
     res.status(400).json({ success: false, error: 'Something went wrong :(' });
+    return;
   }
   if (!acl(req.route.path, req)) {
     res.status(405).json({ error: 'Not allowed' });
     return;
   }
   try {
+    console.log('connections', connections);
     let message = req.body;
+    message.fromId = req.session.user.id;
     message.timestamp = Date.now();
-    await db.query(
+    const query = await db.query(
       `
-      INSERT INTO messages(chat_id, from_id, content, message_timestamp)
-      VALUES($1, $2, $3, to_timestamp($4 / 1000.0))
-      `,
-      [req.body.chatId, req.body.fromId, req.body.content, message.timestamp]
+        INSERT INTO messages(chat_id, from_id, content, message_timestamp)
+        SELECT $1, $2, $3, to_timestamp($4 / 1000.0)
+        WHERE EXISTS(
+            SELECT 1
+            FROM chat_users
+            WHERE chat_id = $1
+            AND user_id = $2
+        )
+        OR EXISTS(
+            SELECT 1
+            FROM users
+            WHERE id = $2
+            AND user_role = 'admin'
+        )
+        RETURNING id
+        `,
+      [
+        req.body.chatId,
+        req.session.user.id,
+        req.body.content,
+        message.timestamp,
+      ]
     );
+
+    message.id = query.rows[0].id;
     broadcast('new-message', message);
-    res.send('ok');
+    res.status(200).json({ success: true });
   } catch (err) {
     res.status(500).json({ success: false, error: err.message });
   }

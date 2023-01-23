@@ -42,6 +42,7 @@ server.use(
     store: store,
   })
 );
-server.use(express.json({ limit: '100mb' }));
+// Limiting the body to 50KB
+server.use(express.json({ limit: '50KB' }));
 server.use(api_url, router);
 server.listen(port, () => console.log(`Server live at ${port}`));
