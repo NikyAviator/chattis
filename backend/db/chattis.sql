@@ -62,6 +62,7 @@ ALTER TABLE "session" ADD CONSTRAINT "session_pkey" PRIMARY KEY ("sid") NOT DEFE
 CREATE INDEX "IDX_session_expire" ON "session" ("expire");
 
 -- Checks if user is admin or creator of the chat
+-- If you create chat the trigger triggers the function that invites and accepts the user that created the chat directly
 CREATE OR REPLACE FUNCTION f_insert_chat_creator()
 RETURNS trigger AS $$
 BEGIN
