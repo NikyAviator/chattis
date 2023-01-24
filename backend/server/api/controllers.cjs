@@ -171,7 +171,6 @@ const logoutUser = async (req, res) => {
 
 // FETCH USER
 const fetchUser = async (req, res) => {
-  // TODO PROBLEM - SEEMS to be working now
   if (!acl(req.route.path, req)) {
     res.status(405).json({ error: 'Not allowed' });
     return;

@@ -14,7 +14,6 @@ const CreateChat = ({ setUserCallback, setChatCallback }) => {
 
   async function onSumbitCreateChat(event) {
     event.preventDefault();
-    console.log('ppc');
     await axios
       .post('/api/chat/create', {
         subject: subject,
