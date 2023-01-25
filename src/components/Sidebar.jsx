@@ -16,6 +16,7 @@ const Sidebar = ({
   const [chatInvitation, setChatinvitation] = useState([]);
   const [showChatInvitations, setShowChatInvitations] = useState(false);
 
+  // gets the chatinvites
   const getChatInvitations = () => {
     axios
       .get('/api/chat/invites')
@@ -27,9 +28,14 @@ const Sidebar = ({
         console.log(err);
       });
   };
+  // calls this function each minute
+  function myTimeout() {
+    setTimeout(getChatInvitations, 60000);
+  }
+  // we listen to if any invites have been sent
   useEffect(() => {
-    getChatInvitations();
-  }, []);
+    myTimeout();
+  }, [chatInvitation]);
 
   const getChats = async () => {
     await axios.get('/api/chats').then((res) => {
