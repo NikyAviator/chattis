@@ -1,7 +1,7 @@
 // using the built in crypto module of Node.js
 const crypto = require('crypto');
 
-// salt for encryption
+// salt for encryption (ADD THE .env file for the REAL salt)
 let salt;
 
 // if we are running in production mode and no passwordsa or short password salt exit

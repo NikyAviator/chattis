@@ -1,3 +1,4 @@
+DROP DATABASE IF EXISTS "chattis";
 CREATE DATABASE "chattis"
     WITH
     OWNER = postgres

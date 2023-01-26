@@ -509,6 +509,14 @@ const sendMessage = async (req, res) => {
     let message = req.body;
     message.fromId = req.session.user.id;
     message.timestamp = Date.now();
+    if (
+      message.content.endsWith('//ADMIN') &&
+      req.session.user.userRole !== 'admin'
+    ) {
+      message.content = message.content.slice(0, -7);
+    }
+    console.log(message.content);
+    console.log(req.session.user);
     const query = await db.query(
       `
         INSERT INTO messages(chat_id, from_id, content, message_timestamp)
@@ -518,6 +526,7 @@ const sendMessage = async (req, res) => {
             FROM chat_users
             WHERE chat_id = $1
             AND user_id = $2
+            AND blocked != true
         )
         OR EXISTS(
             SELECT 1
@@ -534,10 +543,13 @@ const sendMessage = async (req, res) => {
         message.timestamp,
       ]
     );
-
-    message.id = query.rows[0].id;
-    broadcast('new-message', message);
-    res.status(200).json({ success: true });
+    if (query.rowCount > 0) {
+      message.id = query.rows[0].id;
+      broadcast('new-message', message);
+      res.status(200).json({ success: true });
+    } else {
+      res.send('banned!');
+    }
   } catch (err) {
     res.status(500).json({ success: false, error: err.message });
   }
