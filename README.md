@@ -1,15 +1,19 @@
-❌
-✅
 HOW TO START THE PROJECT:
 
+### HOW TO START THE PROJECT:
+
 - [ ] clone & open project in vsCode, inside chattis folder: npm install
+- [ ] in chattis root folder, create .env file and add the following (ask for the .env file):
+
 - [ ] psql -U postgres (starts postgres CLI)
 - [ ] \i /PATH/chattis/backend/db/chattis.sql (executes the sql file and creates the db)
-- [ ] in vscode start the project in order to create a user (an admin):
+- [ ] in vscode start the project in order to create a user (an admin) start the project this way :
+
 - [ ] /backend/server : node server.cjs
 - [ ] /chattis : npm run dev
-- [ ] localhost:3000 är frontend å backend samlat, create a user.
-- [ ] to make the user admin, in terminal:
+
+- [ ] localhost:3000 is where front end and back end is served, create a user via the GUI.
+- [ ] to make the user admin, in terminal (make sure you are connected to the chattis db!):
 - [ ] update users set user_role = 'admin' where user_name = 'YOUR USER NAME';
 - [ ] feel free to create other users as you see fit, and start chatting!
 
